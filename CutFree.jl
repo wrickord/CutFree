@@ -34,11 +34,11 @@ function get_blocking_codes(code, names)
 
     # Constant Time: O(1)
     for (key, value) in IUB_CODES
-        if filter(x -> x != code, value) == IUB_CODES[key] && names
+        if filter(x -> x != code, value) == IUB_CODES[key] && !names
             push!(blocking_codes, value)
         end
 
-        if filter(x -> x != code, value) == IUB_CODES[key] && !names
+        if filter(x -> x != code, value) == IUB_CODES[key] && names
             push!(blocking_codes, key)
         end
     end
@@ -112,7 +112,7 @@ end
 =#
 
 # make_oligo_block Testing
-    # make_oligo_block("ACY")
+    # make_oligo_block("ACGC")
 # 
 
 function print_oligo_block(oligo)
@@ -124,9 +124,56 @@ end
 =#
 
 # print_oligo_block Testing
-    # print_oligo_block("AY")
+    # print_oligo_block("ACGC")
 # 
 
+
+
+function xiny(x, y)
+    return (x ∈ y)
+end
+
+#= xiny Description
+    returns a boolean value of whether or not x is found in y
+=#
+
+# xiny Testing
+    # print(xiny("A", IUB_CODES["C"]))
+# 
+
+
+function which_name(tf)
+    fieldnames(tf)[find(tf)]
+end
+
+function subcodes(code)
+    return IUB_CODES[code]
+    # which_name(mapslices(code -> in(IUB_CODES).(code)))
+end
+
+print(subcodes("K"))
+
+function complement(strings)
+    base_comps = Dict(
+        "A" => "T", 
+        "C" => "G", 
+        "G" => "C", 
+        "T" => "A",
+    )
+end
+
+#= IUB_CODES Description
+    Dictionary consisting of keys and values (IUB codes)
+
+    Keys:
+        Input to call a value of the Dictionary
+    Values:
+        Output of the IUB codes used by CutFree
+=#
+
+# IUB_CODES Testing
+    # println(IUB_CODES["R"][2])
+# 
 
 
 
@@ -138,5 +185,5 @@ end
         println(str_to_vector("CGTACCCGG"))
         print_oligo_block("AY")
     end
-    #=#
+    =#
 #
