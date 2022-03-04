@@ -33,7 +33,11 @@ function get_blocking_codes(code, names)
 end
 
 function str_to_vector(str)
-    return split(str, "")
+    return string.(collect(str))
+end
+
+function vector_to_str(vctr)
+    return join(vctr)
 end
 
 function make_oligo_block(oligo)
@@ -107,6 +111,25 @@ function complement(oligo)
 
     return str_to_vector(codes)
 end
+
+function reverse_complement(oligo)
+    return reverse(complement(oligo))
+end
+
+function degeneracy(oligo)
+    value = 1
+    oligo_bases = str_to_vector(oligo)
+
+    for code in oligo_bases
+        value *= length(IUB_CODES[code])
+    end
+
+    return value
+end
+
+
+
+
 
 # Overall time test
     # @time begin

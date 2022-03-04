@@ -20,21 +20,32 @@ If 'names' is false, a vector of the possible nucleotide groups is returned.
 
 ## Examples:
 ```julia-repl
-julia> print(get_blocking_codes("A", true))
-["T", "C", "G", "Y", "B", "S", "K"]
+julia> println(get_blocking_codes("A", true))
+Any["T", "C", "G", "Y", "B", "S", "K"]
 julia> print(get_blocking_codes("A", false))
-[["T"], ["C"], ["G"], ["C", "T"], ["C", "G", "T"], ["C", "G"], ["G", "T"]]
+Any[["T"], ["C"], ["G"], ["C", "T"], ["C", "G", "T"], ["C", "G"], ["G", "T"]]
+```
+
+# vector_to_str(vctr)
+
+## Description:
+Transform a string into a vector of single strings.
+
+## Examples:
+```julia-repl
+julia> println(str_to_vector("CGTACCCGG"))
+["C", "G", "T", "A", "C", "C", "C", "G", "G"]
 ```
 
 # str_to_vector(str)
 
 ## Description:
-Transform a string into a vector of single characters.
+Transform a vector of strings into a single string.
 
 ## Examples:
 ```julia-repl
-julia> println(str_to_vector("CGTACCCGG"))
-SubString{String}["C", "G", "T", "A", "C", "C", "C", "G", "G"]
+julia> println(vector_to_str(["C", "G", "T", "A", "C", "C", "C", "G", "G"]))
+CGTACCCGG
 ```
 
 # make_oligo_block(oligo)
@@ -46,7 +57,7 @@ Returns four strings denoting the presence of each base.
 
 ## Examples:
 ```julia-repl
-julia> print(make_oligo_block("ACGC"))
+julia> println(make_oligo_block("ACGC"))
 ["A---", "----", "-C-C", "--G-"]
 ```
 
@@ -72,9 +83,9 @@ Returns a boolean value determining if x is contained within a vector y
 
 ## Examples:
 ```julia-repl
-julia> print(xiny("A", IUB_CODES["N"]))
+julia> println(xiny("A", IUB_CODES["N"]))
 true
-julia> print(xiny("A", IUB_CODES["C"]))
+julia> println(xiny("A", IUB_CODES["C"]))
 false
 ```
 
@@ -85,8 +96,8 @@ Return array of IUB codes that are subsets of provided IUB code.
 
 ## Examples:
 ```julia-repl
-julia> print(subcodes("H"))
-SubString{String}["A", "W", "T", "C", "Y", "M", "H"]
+julia> println(subcodes("H"))
+["A", "W", "T", "C", "Y", "M", "H"]
 ```
 
 # complement(oligo)
@@ -96,6 +107,28 @@ Return array the complements for any given IUB codes.
 
 ## Examples:
 ```julia-repl
-julia> print(complement("HA"))
-SubString{String}["D", "T"]
+julia> println(complement("HA"))
+["D", "T"]
+```
+
+# reverse_complement(oligo)
+
+## Description:
+Return the reverse of an array of the complements for any given IUB codes.
+
+## Examples:
+```julia-repl
+julia> println(reverse_complement("HDN"))
+["N", "H", "D"]
+```
+
+# degeneracy(oligo)
+
+## Description:
+Return the number of sequences in a degenerate oligo.
+
+## Examples:
+```julia-repl
+julia> println(degeneracy("NNN"))
+64
 ```
