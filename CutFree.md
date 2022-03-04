@@ -89,7 +89,7 @@ julia> print(subcodes("H"))
 SubString{String}["A", "W", "T", "C", "Y", "M", "H"]
 ```
 
-# compliment(oligo)
+# complement(oligo)
 
 ## Description:
 Return array the complements for any given IUB codes.
