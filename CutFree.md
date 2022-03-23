@@ -132,3 +132,38 @@ Return the number of sequences in a degenerate oligo.
 julia> println(degeneracy("NNN"))
 64
 ```
+
+# cutfree()
+
+## Description:
+Design degenerate oligos free of restriction sites.
+
+Design pools of DNA oligos that are guaranteed to not contain specified restriction enzyme cut sites. All cut sites are blocked while ensuring the optimal number of oligos remain in the pool.
+
+@param len Length of the random oligo. Must be provided if \code{starting_oligo} is not given.
+
+@param sites Character vector of restriction sites to block.
+
+@param starting_oligo Starting oligo from which sites will be removed. If not given, defaults to a string of N's.
+
+@param min_blocks Minimum number of blocks at each site, i.e. the minimum number of changes that need to be made for a cut site to appear anywhere in the oligo.
+
+@param obj_weights Objective function weights for each code's degeneracy.
+
+@param re_randomize If \code{TRUE} (default), re-run the optimization to randomize the codes while maintaining the same number of oligos.
+
+@param obj_frac Fraction of the objective function that must be maintained during re-randomization.
+
+@param seed Seed for the random number generator.
+
+@param quiet Run silently with no output from Gurobi.
+
+@param maxtime Maximum time (in seconds) allowed for the solver.
+
+@return A list containing \code{code} -- the randomize oligo, and a fields describing the MILP and the solution statistics.
+
+## Examples:
+```julia-repl
+julia> println(cutfree(m = 20, sites = ["GGTCTC", "GATATC"], min_blocks = 2))
+
+```

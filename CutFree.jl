@@ -112,9 +112,21 @@ function complement(oligo)
     return str_to_vector(codes)
 end
 
+println(complement("ACA"))
+
 function reverse_complement(oligo)
     return reverse(complement(oligo))
 end
+
+function expand_asymetric(oligo)
+    if (isequal(oligo, reverse_complement(oligo)))
+        return [oligo]
+    else
+        return [oligo, reverse_complement(oligo)]
+    end
+end
+
+println(expand_asymetric("NNN"))
 
 function degeneracy(oligo)
     value = 1
@@ -127,8 +139,24 @@ function degeneracy(oligo)
     return value
 end
 
+function cutfree(;
+            len = 20,
+            sites = [],
+            starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
+            min_blocks = 1,
+            obj_weights = log(1,4),
+            re_randomize = true,
+            seed = nothing,
+            obj_frac = 1.0,
+            quiet = false,
+            maxtime = 30)
 
+    m = len;
+    sites = 
+    starting_oligo = str_to_vector(starting_oligo)
 
+    return starting_oligo
+end
 
 
 # Overall time test
