@@ -204,8 +204,6 @@ function complement(oligo)
     return str_to_vector(codes)
 end
 
-println(complement("ACA"))
-
 """
 reverse_complement(oligo)
 
@@ -224,21 +222,19 @@ end
 expand_asymmetric(oligo)
 
 Description:
-Return the reverse of an array of the complements for any given IUB codes.
+Return both strands if reverse complement is different than oligo.
 
 Example:
-julia> println(reverse_complement("HDN"))
+julia> println(expand_asymmetric("HDN"))
 ["N", "H", "D"]
 """
 function expand_asymetric(oligo)
     if (isequal(str_to_vector(oligo), reverse_complement(oligo)))
         return [oligo]
     else
-        return [oligo, reverse_complement(oligo)]
+        return [oligo, vector_to_str(reverse_complement(oligo))]
     end
 end
-
-println(expand_asymetric("NNN"))
 
 """
 degeneracy(oligo)
