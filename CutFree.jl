@@ -1,3 +1,15 @@
+import Pkg;
+
+Pkg.add("Clp")
+Pkg.add("Gurobi")
+Pkg.add("JuMP")
+
+Pkg.update("Clp")
+Pkg.update("Gurobi")
+Pkg.update("JuMP")
+
+using JuMP, Gurobi
+
 IUB_CODES = Dict(
     "A" => ["A"], 
     "C" => ["C"], 
@@ -278,9 +290,17 @@ function cutfree(;
             quiet = false,
             maxtime = 30)
 
-    m = len;
-    sites = 
     starting_oligo = str_to_vector(starting_oligo)
+    sites = expand_asymetric(starting_oligo)
+    ks = length(sites)
+    m = length(starting_oligo)
+
+    
+    model = Model(Gurobi.Optimizer)
+    set_optimizer_attribute(model, "TimeLimit", maxtime)
+    set_optimizer_attribute(model, "Presolve", 0)
 
     return starting_oligo
 end
+
+cutfree()
