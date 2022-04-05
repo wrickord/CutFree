@@ -273,6 +273,7 @@ end
 cutfree()
 
 Description:
+Return a site-free random of maximum diversity. This single degenerate sequence can be used to synthesize a pool of oligos with mixed bases.
 
 Example:
 julia>
