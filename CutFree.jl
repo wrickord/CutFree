@@ -273,35 +273,50 @@ end
 cutfree()
 
 Description:
-Return a site-free random of maximum diversity. This single degenerate sequence can be used to synthesize a pool of oligos with mixed bases.
+Return a site-free random of maximum diversity (of nucleotides). This single degenerate sequence can be used to synthesize a pool of oligos with mixed bases.
 
 Example:
 julia>
 
 """
 function cutfree(;
-            len = 20,
-            sites = [],
             starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
+            restriction_sites = ["GGTCTC", "GGCCGG"],
             min_blocks = 1,
-            obj_weights = log(1,4),
-            re_randomize = true,
-            seed = nothing,
-            obj_frac = 1.0,
-            quiet = false,
-            maxtime = 30)
+            increase_diversity = true,
+            )
+
+    m = length(starting_oligo)
+    k = []
+    for i in restriction_sites
+        push!(k, length(i))
+    end
 
     starting_oligo = str_to_vector(starting_oligo)
-    sites = expand_asymetric(starting_oligo)
-    ks = length(sites)
-    m = length(starting_oligo)
+    number_binary = 15 * m
+    allowed_codes = []
 
+    for i in 1:m
+        subs = subcodes(starting_oligo[i])
+        blocking = get_blocking_codes(starting_oligo[i], false)
+        for b in subs
+            
+        end
+        
+    end
+
+    # Find the maximum acheivable diversity and optimal objective value
+
+    # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
+
+    # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
     
-    model = Model(Gurobi.Optimizer)
-    set_optimizer_attribute(model, "TimeLimit", maxtime)
-    set_optimizer_attribute(model, "Presolve", 0)
+    #=  model = Model(Gurobi.Optimizer)
+        set_optimizer_attribute(model, "TimeLimit", maxtime)
+        set_optimizer_attribute(model, "Presolve", 0)
+    =#
 
-    return starting_oligo
+    return nothing
 end
 
 cutfree()
