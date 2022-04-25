@@ -14,8 +14,6 @@ Pkg.update("NamedArrays")
 
 using Clp, JuMP, Gurobi, DataStructures, NamedArrays
 
-
-
 IUB_CODES = Dict(
     "A" => ["A"], 
     "C" => ["C"], 
@@ -282,8 +280,8 @@ julia>
 
 """
 function cutfree(;
-            starting_oligo = "ANBNNNNNNNNNNNNNNNNN",
-            restriction_sites = ["GGTCTC", "GGCCGG"],
+            starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
+            restriction_sites = ["GGTCTC"],
             min_blocks = 1,
             increase_diversity = true,
             )
@@ -297,25 +295,9 @@ function cutfree(;
         push!(sites, expand_asymmetric(restriction_sites[i])[2])
     end
 
+    println(sites)
+
     A = NamedArray(zeros(15, m+1), (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"], 1:m+1), ("IUB_CODES", "Position"))
-    x = []
-    A_x = Dict(
-        "A" => 0, 
-        "C" => 0,
-        "G" => 0,
-        "T" => 0,
-        "R" => 0,
-        "Y" => 0,
-        "M" => 0,
-        "K" => 0,
-        "S" => 0,
-        "W" => 0,
-        "H" => 0,
-        "B" => 0,
-        "V" => 0,
-        "D" => 0,
-        "N" => 0,
-    )
 
     for i in 1:m
         subs = subcodes(string(starting_oligo[i]))
@@ -332,88 +314,52 @@ function cutfree(;
         end
     end
 
-    for i in 1:m
-        push!(x, names(A, 1)[findall(x -> x == 1, A[names(A, 1), i])[1]])
-    end
+    println(A)
 
-    max_score = degeneracy(vector_to_str(x))
-
-    #=
-    k = [key for (key, value) in A_x if value == 1]
-    A_x = replace(kv -> kv[1] => 0, A_x)
+    max_score_sequence = []
 
     for i in 1:m
-        temp = ""
-        score = 0
-
-        for code in k
-            if degeneracy(code) > score
-                score = degeneracy(code)
-                temp = code
-            end
-        end
-
-        push!(x, temp)
+        push!(max_score_sequence, names(A, 1)[findall(x -> x == 1, A[names(A, 1), i])[1]])
     end
-    =#
 
-    #=
-    curr_row = 1
+    max_score_sequence = vector_to_str(max_score_sequence)
+    print_oligo_block(max_score_sequence)
+    max_score = degeneracy(max_score_sequence)
+    println(max_score)
+
+    B = NamedArray(zeros(15, m+1), 
+        (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"], 1:m+1), ("IUB_CODES", "Position"))
 
     for rs in sites
-        for j in 1:m-length(rs)+1
-            for i in 1:length(rs)
-                blocked = get_blocking_codes(string(rs[i]), true)
+        for i in 1:m-length(rs)+1
+            for j in 1:length(rs)
+                blocked = get_blocking_codes(string(rs[j]), true)
                 for b in blocked
-                    value = findall(x -> x == 1, A[names(A, 1), i])
-                    if degeneracy(b) > degeneracy(names(A, 1)[value[1]])
-                        A[names(A, 1)[value[1]], i] = 0
-                        A[b, i] = 1
+                    if B[:, i+j-1] == B[:, 21]
+                        B[b, i+j-1] = 1
+                    else
+                        value = findall(x -> x == 1, B[names(B, 1), i+j-1])
+                        if degeneracy(b) > degeneracy(names(B, 1)[value[1]])
+                            B[names(B, 1)[value[1]], i+j-1] = 0
+                            B[b, i+j-1] = 1
+                        end
                     end
                 end
             end
-
-            curr_row = curr_row + 1
         end
     end
-    =#
+
+    println(B)
     
-    println(A)
-    println()
-
-    x = vector_to_str(x)
-    print_oligo_block(x)
-    score = degeneracy(x)
-    println(score)
-
     # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
 
-    # k = []
-    # for i in restriction_sites
-    #     push!(k, length(i))
-    # end
 
     # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
-    
-    #=  model = Model(Gurobi.Optimizer)
-        set_optimizer_attribute(model, "TimeLimit", maxtime)
-        set_optimizer_attribute(model, "Presolve", 0)
-        Model1 = Model(with_optimizer(Cbc.Optimizer))
-        CR = [11; 11; 11; 11; 11]
-        CO = [50; 50; 50; 50; 50]
 
-        #sets
-        a = 80 #atividades
-        t = 18 #peírodo de tempo
-        w = 5 #centro de trabalho
-        #variable
-        @variable(Model1,r[1:a,1:t], lower_bound=0)
-        @variable(Model1,o[1:a,1:t], lower_bound=0)
-        #objective function
-        @objective(Model1,Min,sum(CR[w]*(r[a,t]+o[a,t])+CO[w]*o[a,t]))
+    #=
+    model = Model(Gurobi.Optimizer)
+    optimize!(model)
     =#
-
-    return nothing
 end
 
 cutfree()
