@@ -146,6 +146,7 @@ function print_oligo_block(oligo)
     * "\n" * make_oligo_block(oligo)[3] * "\n" * make_oligo_block(oligo)[4])
 end
 
+#=
 """
 xiny(x,y)
 
@@ -161,6 +162,7 @@ false
 function xiny(x, y)
     return (x ∈ y)
 end
+=#
 
 """
 subcodes(code)
@@ -302,30 +304,11 @@ function cutfree(;
     for i in 1:m
         subs = subcodes(string(starting_oligo[i]))
         for b in subs
-            if A[:, i] == A[:, 21]
-                A[b, i] = 1
-            else
-                value = findall(x -> x == 1, A[names(A, 1), i])
-                if degeneracy(b) > degeneracy(names(A, 1)[value[1]])
-                    A[names(A, 1)[value[1]], i] = 0
-                    A[b, i] = 1
-                end
-            end
+            A[b, i] = 1
         end
     end
 
     println(A)
-
-    max_score_sequence = []
-
-    for i in 1:m
-        push!(max_score_sequence, names(A, 1)[findall(x -> x == 1, A[names(A, 1), i])[1]])
-    end
-
-    max_score_sequence = vector_to_str(max_score_sequence)
-    print_oligo_block(max_score_sequence)
-    max_score = degeneracy(max_score_sequence)
-    println(max_score)
 
     B = NamedArray(zeros(15, m+1), 
         (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"], 1:m+1), ("IUB_CODES", "Position"))
@@ -335,6 +318,9 @@ function cutfree(;
             for j in 1:length(rs)
                 blocked = get_blocking_codes(string(rs[j]), true)
                 for b in blocked
+                    B[b, i+j-1] = 1
+
+                    #=
                     if B[:, i+j-1] == B[:, 21]
                         B[b, i+j-1] = 1
                     else
@@ -344,6 +330,7 @@ function cutfree(;
                             B[b, i+j-1] = 1
                         end
                     end
+                    =#
                 end
             end
         end
