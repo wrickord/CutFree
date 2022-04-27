@@ -299,9 +299,6 @@ function cutfree(;
         end
     end
 
-    B = NamedArray(zeros(15, m+1), 
-        (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"], 1:m+1), ("IUB_CODES", "Position"))
-
     for rs in sites
         for i in 1:m-length(rs)+1
             for j in 1:length(rs)
@@ -315,20 +312,6 @@ function cutfree(;
 
     A = A[:, 1:m]
     println(A)
-
-    #B = B[:, 1:m]
-    #println(B)
-
-    #println(names(A, 1)[1])
-
-    #=
-    m=Model(Gurobi.Optimizer)
-    set_optimizer_attribute(m, "ResultFile", "theHintFile.sol")
-    @variable(m, z[1:5], Bin)
-    @objective(m, Min, sum(z))
-    @constraint(m, sum(z[i]*i for i=1:5)<=5)
-    optimize!(m)
-    =#
 
     model = Model(Gurobi.Optimizer)
     set_optimizer_attribute(model, "ResultFile", "CutFree.sol")
