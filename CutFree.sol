@@ -1,4 +1,4 @@
-# Objective value = 20
+# Objective value = 0
 input[1,1] 1
 input[2,1] 1
 input[3,1] 1
@@ -613,7 +613,7 @@ output[11,1] 0
 output[12,1] 0
 output[13,1] 0
 output[14,1] 0
-output[15,1] 1
+output[15,1] 0
 output[1,2] 0
 output[2,2] 0
 output[3,2] 0
@@ -628,7 +628,7 @@ output[11,2] 0
 output[12,2] 0
 output[13,2] 0
 output[14,2] 0
-output[15,2] 1
+output[15,2] 0
 output[1,3] 0
 output[2,3] 0
 output[3,3] 0
@@ -643,7 +643,7 @@ output[11,3] 0
 output[12,3] 0
 output[13,3] 0
 output[14,3] 0
-output[15,3] 1
+output[15,3] 0
 output[1,4] 0
 output[2,4] 0
 output[3,4] 0
@@ -658,7 +658,7 @@ output[11,4] 0
 output[12,4] 0
 output[13,4] 0
 output[14,4] 0
-output[15,4] 1
+output[15,4] 0
 output[1,5] 0
 output[2,5] 0
 output[3,5] 0
@@ -673,7 +673,7 @@ output[11,5] 0
 output[12,5] 0
 output[13,5] 0
 output[14,5] 0
-output[15,5] 1
+output[15,5] 0
 output[1,6] 0
 output[2,6] 0
 output[3,6] 0
@@ -688,7 +688,7 @@ output[11,6] 0
 output[12,6] 0
 output[13,6] 0
 output[14,6] 0
-output[15,6] 1
+output[15,6] 0
 output[1,7] 0
 output[2,7] 0
 output[3,7] 0
@@ -703,7 +703,7 @@ output[11,7] 0
 output[12,7] 0
 output[13,7] 0
 output[14,7] 0
-output[15,7] 1
+output[15,7] 0
 output[1,8] 0
 output[2,8] 0
 output[3,8] 0
@@ -718,7 +718,7 @@ output[11,8] 0
 output[12,8] 0
 output[13,8] 0
 output[14,8] 0
-output[15,8] 1
+output[15,8] 0
 output[1,9] 0
 output[2,9] 0
 output[3,9] 0
@@ -733,7 +733,7 @@ output[11,9] 0
 output[12,9] 0
 output[13,9] 0
 output[14,9] 0
-output[15,9] 1
+output[15,9] 0
 output[1,10] 0
 output[2,10] 0
 output[3,10] 0
@@ -748,7 +748,7 @@ output[11,10] 0
 output[12,10] 0
 output[13,10] 0
 output[14,10] 0
-output[15,10] 1
+output[15,10] 0
 output[1,11] 0
 output[2,11] 0
 output[3,11] 0
@@ -763,7 +763,7 @@ output[11,11] 0
 output[12,11] 0
 output[13,11] 0
 output[14,11] 0
-output[15,11] 1
+output[15,11] 0
 output[1,12] 0
 output[2,12] 0
 output[3,12] 0
@@ -778,7 +778,7 @@ output[11,12] 0
 output[12,12] 0
 output[13,12] 0
 output[14,12] 0
-output[15,12] 1
+output[15,12] 0
 output[1,13] 0
 output[2,13] 0
 output[3,13] 0
@@ -793,7 +793,7 @@ output[11,13] 0
 output[12,13] 0
 output[13,13] 0
 output[14,13] 0
-output[15,13] 1
+output[15,13] 0
 output[1,14] 0
 output[2,14] 0
 output[3,14] 0
@@ -808,7 +808,7 @@ output[11,14] 0
 output[12,14] 0
 output[13,14] 0
 output[14,14] 0
-output[15,14] 1
+output[15,14] 0
 output[1,15] 0
 output[2,15] 0
 output[3,15] 0
@@ -823,7 +823,7 @@ output[11,15] 0
 output[12,15] 0
 output[13,15] 0
 output[14,15] 0
-output[15,15] 1
+output[15,15] 0
 output[1,16] 0
 output[2,16] 0
 output[3,16] 0
@@ -838,7 +838,7 @@ output[11,16] 0
 output[12,16] 0
 output[13,16] 0
 output[14,16] 0
-output[15,16] 1
+output[15,16] 0
 output[1,17] 0
 output[2,17] 0
 output[3,17] 0
@@ -853,7 +853,7 @@ output[11,17] 0
 output[12,17] 0
 output[13,17] 0
 output[14,17] 0
-output[15,17] 1
+output[15,17] 0
 output[1,18] 0
 output[2,18] 0
 output[3,18] 0
@@ -868,7 +868,7 @@ output[11,18] 0
 output[12,18] 0
 output[13,18] 0
 output[14,18] 0
-output[15,18] 1
+output[15,18] 0
 output[1,19] 0
 output[2,19] 0
 output[3,19] 0
@@ -883,7 +883,7 @@ output[11,19] 0
 output[12,19] 0
 output[13,19] 0
 output[14,19] 0
-output[15,19] 1
+output[15,19] 0
 output[1,20] 0
 output[2,20] 0
 output[3,20] 0
@@ -898,4 +898,4 @@ output[11,20] 0
 output[12,20] 0
 output[13,20] 0
 output[14,20] 0
-output[15,20] 1
+output[15,20] 0

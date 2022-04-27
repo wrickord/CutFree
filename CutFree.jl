@@ -41,15 +41,17 @@ IUB_CODES = Dict(
 """
 get_blocking_codes(code, names)
 
-Description:
+    Description:
     Find IUB codes that do not contain a specified nucleotide code.
     If 'names' is true, a vector of the possible IUB codes is returned. 
     If 'names' is false, a vector of the possible nucleotide groups is returned.
 
-Examples:
+    Examples:
     julia> println(get_blocking_codes("A", true))
+
     Any["T", "C", "G", "Y", "B", "S", "K"]
     julia> print(get_blocking_codes("A", false))
+
     Any[["T"], ["C"], ["G"], ["C", "T"], ["C", "G", "T"], ["C", "G"], ["G", "T"]]
 """
 function get_blocking_codes(code, names)
@@ -71,12 +73,13 @@ end
 """
 str_to_vector(str)
 
-Description:
-Transform a string into a vector of single strings.
+    Description:
+    Transform a string into a vector of single strings.
 
-Example:
-julia> println(str_to_vector("CGTACCCGG"))
-["C", "G", "T", "A", "C", "C", "C", "G", "G"]
+    Example:
+    julia> println(str_to_vector("CGTACCCGG"))
+
+    ["C", "G", "T", "A", "C", "C", "C", "G", "G"]
 """
 function str_to_vector(str)
     return string.(collect(str))
@@ -85,12 +88,13 @@ end
 """
 vector_to_str(vctr)
 
-Description:
-Transform a vector of strings into a single string.
+    Description:
+    Transform a vector of strings into a single string.
 
-Example:
-julia> println(vector_to_str(["C", "G", "T", "A", "C", "C", "C", "G", "G"]))
-CGTACCCGG
+    Example:
+    julia> println(vector_to_str(["C", "G", "T", "A", "C", "C", "C", "G", "G"]))
+
+    CGTACCCGG
 """
 function vector_to_str(vctr)
     return join(vctr)
@@ -99,14 +103,15 @@ end
 """
 make_oligo_block(oligo)
 
-Description:
-Creates a text block showing which bases are allowed by the oligo. 
+    Description:
+    Creates a text block showing which bases are allowed by the oligo. 
 
-Returns four strings denoting the presence of each base.
+    Returns four strings denoting the presence of each base.
 
-Example:
-julia> println(make_oligo_block("ACGC"))
-["A---", "----", "-C-C", "--G-"]
+    Example:
+    julia> println(make_oligo_block("ACGC"))
+
+    ["A---", "----", "-C-C", "--G-"]
 """
 function make_oligo_block(oligo)
     oligo_bases = str_to_vector(oligo)
@@ -136,16 +141,17 @@ end
 """
 print_oligo_block(oligo)
 
-Description:
-Prints the oligo and the output of make_oligo_block.
+    Description:
+    Prints the oligo and the output of make_oligo_block.
 
-Example:
-julia> print_oligo_block("NAGN")
-NAGN
-AA-A
-T--T
-C--C
-G-GG
+    Example:
+    julia> print_oligo_block("NAGN")
+
+    NAGN
+    AA-A
+    T--T
+    C--C
+    G-GG
 """
 function print_oligo_block(oligo)
     return println(oligo * "\n" * make_oligo_block(oligo)[1] * "\n" * make_oligo_block(oligo)[2]
@@ -155,12 +161,13 @@ end
 """
 subcodes(code)
 
-Description:
-Return array of IUB codes that are subsets of provided IUB code.
+    Description:
+    Return array of IUB codes that are subsets of provided IUB code.
 
-Example:
-julia> println(subcodes("H"))
-["A", "W", "T", "C", "Y", "M", "H"]
+    Example:
+    julia> println(subcodes("H"))
+
+    ["A", "W", "T", "C", "Y", "M", "H"]
 """
 function subcodes(code)
     codes = ""
@@ -177,12 +184,13 @@ end
 """
 complement(oligo)
 
-Description:
-Return array of the complements for any given IUB codes.
+    Description:
+    Return array of the complements for any given IUB codes.
 
-Example:
-julia> println(complement("HA"))
-["D", "T"]
+    Example:
+    julia> println(complement("HA"))
+
+    ["D", "T"]
 """
 function complement(oligo)
     codes = ""
@@ -213,12 +221,13 @@ end
 """
 reverse_complement(oligo)
 
-Description:
-Return the reverse of an array of the complements for any given IUB codes.
+    Description:
+    Return the reverse of an array of the complements for any given IUB codes.
 
-Example:
-julia> println(reverse_complement("HDN"))
-["N", "H", "D"]
+    Example:
+    julia> println(reverse_complement("HDN"))
+
+    ["N", "H", "D"]
 """
 function reverse_complement(oligo)
     return reverse(complement(oligo))
@@ -227,12 +236,13 @@ end
 """
 expand_asymmetric(oligo)
 
-Description:
-Return both strands if reverse complement is different than oligo.
+    Description:
+    Return both strands if reverse complement is different than oligo.
 
-Example:
-julia> println(expand_asymmetric("HDN"))
-["HDN", "NHD"]
+    Example:
+    julia> println(expand_asymmetric("HDN"))
+
+    ["HDN", "NHD"]
 """
 function expand_asymmetric(oligo)
     return [oligo, vector_to_str(reverse_complement(oligo))]
@@ -241,12 +251,13 @@ end
 """
 degeneracy(oligo)
 
-Description:
-Return the number of sequences in a degenerate oligo.
+    Description:
+    Return the number of sequences in a degenerate oligo.
 
-Example:
-julia> println(degeneracy("NNN"))
-64
+    Example:
+    julia> println(degeneracy("NNN"))
+
+    64
 """
 function degeneracy(oligo)
     value = 1
@@ -262,11 +273,11 @@ end
 """
 cutfree()
 
-Description:
-Return a site-free random of maximum diversity (of nucleotides). This single degenerate sequence can be used to synthesize a pool of oligos with mixed bases.
+    Description:
+    Return a site-free random of maximum diversity (of nucleotides). This single degenerate sequence can be used to synthesize a pool of oligos with mixed bases.
 
-Example:
-julia>
+    Example:
+    julia>
 
 """
 function cutfree(;
@@ -277,6 +288,9 @@ function cutfree(;
             )
 
     # Find the maximum acheivable diversity and optimal objective value
+    # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
+    # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
+
     m = length(starting_oligo)
     sites = []
 
@@ -319,17 +333,12 @@ function cutfree(;
     @variable(model, input[1:30, 1:m], Bin)
     fix.(input, A)
 
-    #@variable(model, re[1:15, 1:m], Bin)
-    #fix.(re, B)
-
+    A = A[1:15, 1:m]
+    println(A)
     @variable(model, output[1:15, 1:m], Bin)
-    set_start_value.(output, ones(15, m))
-    
-    optimize!(model)
-
+    set_start_value.(output, A)
+  
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1)
-
-    @objective(model, Max, sum(output))
 
     optimize!(model)
 
@@ -345,15 +354,6 @@ function cutfree(;
 
     print_oligo_block(oligo)
     println(degeneracy(oligo))
-    # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
-
-
-    # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
-
-    #=
-    model = Model(Gurobi.Optimizer)
-    optimize!(model)
-    =#
     
 end
 
