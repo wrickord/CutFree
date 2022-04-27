@@ -281,7 +281,7 @@ cutfree()
 
 """
 function cutfree(;
-            starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
+            starting_oligo = "ANNNNNNNNN",
             restriction_sites = ["GGTCTC"],
             min_blocks = 1,
             increase_diversity = true,
@@ -334,11 +334,25 @@ function cutfree(;
     fix.(input, A)
 
     A = A[1:15, 1:m]
-    println(A)
+
     @variable(model, output[1:15, 1:m], Bin)
     set_start_value.(output, A)
-  
+
+    optimize!(model)
+
+    oligo = ""
+
+    for i in 1:15
+        for j in 1:m
+            if value.(output[i, j]) == 1
+                oligo *= names(A, 1)[i]
+            end
+        end
+    end
+
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1)
+    @objective(model, Max, degeneracy(oligo))
+    #@objective(model, Max, sum(output))
 
     optimize!(model)
 
@@ -353,8 +367,7 @@ function cutfree(;
     end
 
     print_oligo_block(oligo)
-    println(degeneracy(oligo))
-    
+    println(degeneracy(oligo))  
 end
 
 cutfree()
