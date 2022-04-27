@@ -6,13 +6,19 @@ Pkg.add("JuMP")
 Pkg.add("DataStructures")
 Pkg.add("NamedArrays")
 
+Pkg.build("Clp")
+Pkg.build("Gurobi")
+Pkg.build("JuMP")
+Pkg.build("DataStructures")
+Pkg.build("NamedArrays")
+
 Pkg.update("Clp")
 Pkg.update("Gurobi")
 Pkg.update("JuMP")
-Pkg.add("DataStructures")
+Pkg.update("DataStructures")
 Pkg.update("NamedArrays")
 
-using Clp, JuMP, Gurobi, DataStructures, NamedArrays
+using Clp, Gurobi, JuMP, DataStructures, NamedArrays
 
 IUB_CODES = Dict(
     "A" => ["A"], 
@@ -145,24 +151,6 @@ function print_oligo_block(oligo)
     return println(oligo * "\n" * make_oligo_block(oligo)[1] * "\n" * make_oligo_block(oligo)[2]
     * "\n" * make_oligo_block(oligo)[3] * "\n" * make_oligo_block(oligo)[4])
 end
-
-#=
-"""
-xiny(x,y)
-
-Description:
-Returns a boolean value determining if x is contained within a vector y
-
-Examples:
-julia> println(xiny("A", IUB_CODES["N"]))
-true
-julia> println(xiny("A", IUB_CODES["C"]))
-false
-"""
-function xiny(x, y)
-    return (x ∈ y)
-end
-=#
 
 """
 subcodes(code)
@@ -299,7 +287,10 @@ function cutfree(;
 
     println(sites)
 
-    A = NamedArray(zeros(15, m+1), (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"], 1:m+1), ("IUB_CODES", "Position"))
+    A = NamedArray(zeros(30, m+1), (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N", 
+        "A_blocked", "C_blocked", "G_blocked", "T_blocked", "R_blocked", "Y_blocked", "M_blocked", "K_blocked",
+        "S_blocked", "W_blocked", "H_blocked", "B_blocked", "V_blocked", "D_blocked", "N_blocked"],
+        1:m+1), ("IUB_CODES", "Position"))
 
     for i in 1:m
         subs = subcodes(string(starting_oligo[i]))
@@ -307,8 +298,6 @@ function cutfree(;
             A[b, i] = 1
         end
     end
-
-    println(A)
 
     B = NamedArray(zeros(15, m+1), 
         (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"], 1:m+1), ("IUB_CODES", "Position"))
@@ -318,26 +307,61 @@ function cutfree(;
             for j in 1:length(rs)
                 blocked = get_blocking_codes(string(rs[j]), true)
                 for b in blocked
-                    B[b, i+j-1] = 1
-
-                    #=
-                    if B[:, i+j-1] == B[:, 21]
-                        B[b, i+j-1] = 1
-                    else
-                        value = findall(x -> x == 1, B[names(B, 1), i+j-1])
-                        if degeneracy(b) > degeneracy(names(B, 1)[value[1]])
-                            B[names(B, 1)[value[1]], i+j-1] = 0
-                            B[b, i+j-1] = 1
-                        end
-                    end
-                    =#
+                    A[string(b, "_blocked"), i+j-1] = 1
                 end
             end
         end
     end
 
-    println(B)
+    A = A[:, 1:m]
+    println(A)
+
+    #B = B[:, 1:m]
+    #println(B)
+
+    #println(names(A, 1)[1])
+
+    #=
+    m=Model(Gurobi.Optimizer)
+    set_optimizer_attribute(m, "ResultFile", "theHintFile.sol")
+    @variable(m, z[1:5], Bin)
+    @objective(m, Min, sum(z))
+    @constraint(m, sum(z[i]*i for i=1:5)<=5)
+    optimize!(m)
+    =#
+
+    model = Model(Gurobi.Optimizer)
+    set_optimizer_attribute(model, "ResultFile", "CutFree.sol")
+
+    @variable(model, input[1:30, 1:m], Bin)
+    fix.(input, A)
+
+    #@variable(model, re[1:15, 1:m], Bin)
+    #fix.(re, B)
+
+    @variable(model, output[1:15, 1:m], Bin)
+    set_start_value.(output, ones(15, m))
     
+    optimize!(model)
+
+    @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1)
+
+    @objective(model, Max, sum(output))
+
+    optimize!(model)
+
+    oligo = ""
+
+    for i in 1:15
+        for j in 1:m
+            if value.(output[i, j]) == 1
+                oligo *= names(A, 1)[i]
+            end
+        end
+    end
+
+    print_oligo_block(oligo)
+    println(degeneracy(oligo))
     # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
 
 
@@ -347,6 +371,7 @@ function cutfree(;
     model = Model(Gurobi.Optimizer)
     optimize!(model)
     =#
+    
 end
 
 cutfree()
