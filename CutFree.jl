@@ -154,8 +154,10 @@ print_oligo_block(oligo)
     G-GG
 """
 function print_oligo_block(oligo)
-    return println(oligo * "\n" * make_oligo_block(oligo)[1] * "\n" * make_oligo_block(oligo)[2]
+    println(oligo * "\n" * make_oligo_block(oligo)[1] * "\n" * make_oligo_block(oligo)[2]
     * "\n" * make_oligo_block(oligo)[3] * "\n" * make_oligo_block(oligo)[4])
+
+    return string(oligo)
 end
 
 """
@@ -281,7 +283,7 @@ cutfree()
 
 """
 function cutfree(;
-            starting_oligo = "ANNNNNNNNN",
+            starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
             restriction_sites = ["GGTCTC"],
             min_blocks = 1,
             increase_diversity = true,
@@ -324,50 +326,68 @@ function cutfree(;
         end
     end
 
-    A = A[:, 1:m]
-    println(A)
+    B = A[16:30, 1:m]
+    A = A[1:15, 1:m]
 
+    println(A)
+    println(B)
+    
     model = Model(Gurobi.Optimizer)
     set_optimizer_attribute(model, "ResultFile", "CutFree.sol")
 
-    @variable(model, input[1:30, 1:m], Bin)
-    fix.(input, A)
-
-    A = A[1:15, 1:m]
-
-    @variable(model, output[1:15, 1:m], Bin)
-    set_start_value.(output, A)
-
-    optimize!(model)
-
-    oligo = ""
-
+    C = zeros(15, m) # degeneracy matrix
     for i in 1:15
         for j in 1:m
-            if value.(output[i, j]) == 1
-                oligo *= names(A, 1)[i]
-            end
+            C[i, j] = log10(length(IUB_CODES[names(A,1)[i]]))
+        end
+    end
+
+    @variable(model, output[1:15, 1:m], Bin)
+    for rs in restriction_sites
+        for i in 1:m-length(rs)
+            @constraint(model, sum(output[j] for j=findall(x->x==1, B[:, i:i+length(rs)])) .>= 1)
         end
     end
 
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1)
-    @objective(model, Max, degeneracy(oligo))
-    #@objective(model, Max, sum(output))
+    @objective(model, Max, sum(C .* output))
+    @objective(model, Max, sum(output[i] for i=findall(x->x==1, A)))
+    
+    optimize!(model)
+
+    oligo = ""
+
+    for i in 1:m
+        for j in 1:15
+            if value.(output[j, i]) == 1
+                oligo *= names(A, 1)[j]
+            end
+        end
+    end
+
+    #= 
+    maximum_diversity = degeneracy(oligo)
+
+    D = rand(15, m)
+    println(D)
+    @constraint(model, sum(C .* output) == maximum_diversity)
+    @objective(model, Max, sum(D .* output))
+    #@constraint(model, sum(output[j, i] for i=1:m, j=findall(x->x==1, A[:, i])) .>= m)
 
     optimize!(model)
 
     oligo = ""
 
-    for i in 1:15
-        for j in 1:m
-            if value.(output[i, j]) == 1
-                oligo *= names(A, 1)[i]
+    for i in 1:m
+        for j in 1:15
+            if value.(output[j, i]) == 1
+                oligo *= names(A, 1)[j]
             end
         end
     end
+    =#
 
-    print_oligo_block(oligo)
-    println(degeneracy(oligo))  
+    return print_oligo_block(oligo), degeneracy(oligo)
 end
 
 cutfree()
