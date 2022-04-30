@@ -315,31 +315,21 @@ function cutfree(;
         end
     end
 
-    for rs in sites
-        for i in 1:m-length(rs)+1
-            for j in 1:length(rs)
-                blocked = get_blocking_codes(string(rs[j]), true)
-                for b in blocked
-                    A[string(b, "_blocked"), i+j-1] = 1
-                end
-            end
+    for rs in sites, i in 1:m-length(rs)+1, j in 1:length(rs)
+        blocked = get_blocking_codes(string(rs[j]), true)
+        for b in blocked
+            A[string(b, "_blocked"), i+j-1] = 1
         end
     end
 
-    B = A[16:30, 1:m]
-    A = A[1:15, 1:m]
-
-    println(A)
-    println(B)
+    B = A[16:30, 1:m] # matrix of blocking codes
+    A = A[1:15, 1:m] # matrix of subcodes
     
     model = Model(Gurobi.Optimizer)
-    set_optimizer_attribute(model, "ResultFile", "CutFree.sol")
 
     C = zeros(15, m) # degeneracy matrix
-    for i in 1:15
-        for j in 1:m
-            C[i, j] = log10(length(IUB_CODES[names(A,1)[i]]))
-        end
+    for i in 1:15, j in 1:m
+        C[i, j] = log10(length(IUB_CODES[names(A,1)[i]])) # assign degeneracy values to matrix
     end
 
     @variable(model, output[1:15, 1:m], Bin)
@@ -351,7 +341,7 @@ function cutfree(;
 
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1)
     @objective(model, Max, sum(C .* output))
-    @objective(model, Max, sum(output[i] for i=findall(x->x==1, A)))
+    @objective(model, Max, sum(output[i] for i=findall(x->x==1, A))) # maximize allowed sequences
     
     optimize!(model)
 
@@ -386,6 +376,8 @@ function cutfree(;
         end
     end
     =#
+    println(A)
+    println(B)
 
     return print_oligo_block(oligo), degeneracy(oligo)
 end
