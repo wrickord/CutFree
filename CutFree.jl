@@ -301,12 +301,12 @@ function cutfree(;
         push!(sites, expand_asymmetric(restriction_sites[i])[2])
     end
 
-    println(sites)
+    A = NamedArray(zeros(15, m), (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"],
+        1:m), ("IUB_CODES", "Position"))
 
-    A = NamedArray(zeros(30, m+1), (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N", 
-        "A_blocked", "C_blocked", "G_blocked", "T_blocked", "R_blocked", "Y_blocked", "M_blocked", "K_blocked",
-        "S_blocked", "W_blocked", "H_blocked", "B_blocked", "V_blocked", "D_blocked", "N_blocked"],
-        1:m+1), ("IUB_CODES", "Position"))
+    B = NamedArray(zeros(15, m), (["A_blocked", "C_blocked", "G_blocked", "T_blocked", "R_blocked", "Y_blocked",
+        "M_blocked", "K_blocked", "S_blocked", "W_blocked", "H_blocked", "B_blocked", "V_blocked", 
+        "D_blocked", "N_blocked"], 1:m), ("IUB_CODES", "Position"))
 
     for i in 1:m
         subs = subcodes(string(starting_oligo[i]))
@@ -318,12 +318,9 @@ function cutfree(;
     for rs in sites, i in 1:m-length(rs)+1, j in 1:length(rs)
         blocked = get_blocking_codes(string(rs[j]), true)
         for b in blocked
-            A[string(b, "_blocked"), i+j-1] = 1
+            B[string(b, "_blocked"), i+j-1] = 1
         end
     end
-
-    B = A[16:30, 1:m] # matrix of blocking codes
-    A = A[1:15, 1:m] # matrix of subcodes
     
     model = Model(Gurobi.Optimizer)
 
@@ -333,16 +330,14 @@ function cutfree(;
     end
 
     @variable(model, output[1:15, 1:m], Bin)
-    for rs in restriction_sites
-        for i in 1:m-length(rs)
-            @constraint(model, sum(output[j] for j=findall(x->x==1, B[:, i:i+length(rs)])) .>= 1)
-        end
+
+    for rs in restriction_sites, i in 1:m-length(rs)
+        @constraint(model, sum(output[k, j] for j=i:i+length(rs)-1, k=findall(x->x==1, B[:, j])) .>= 1)
     end
 
+    @constraint(model, sum(output[i] for i=findall(x->x==0, A)) .== 0)
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1)
-    @objective(model, Max, sum(C .* output))
-    @objective(model, Max, sum(output[i] for i=findall(x->x==1, A))) # maximize allowed sequences
-    
+    @objective(model, Max, sum(C .* output))    
     optimize!(model)
 
     oligo = ""
@@ -355,7 +350,10 @@ function cutfree(;
         end
     end
 
-    #= 
+    
+    
+
+    #=
     maximum_diversity = degeneracy(oligo)
 
     D = rand(15, m)
@@ -376,6 +374,9 @@ function cutfree(;
         end
     end
     =#
+
+    println(sites)
+
     println(A)
     println(B)
 
