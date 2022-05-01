@@ -332,7 +332,7 @@ function cutfree(;
     @variable(model, output[1:15, 1:m], Bin)
 
     for rs in restriction_sites, i in 1:m-length(rs)
-        @constraint(model, sum(output[k, j] for j=i:i+length(rs)-1, k=findall(x->x==1, B[:, j])) .>= 1)
+        @constraint(model, sum(output[k, j] for j=i:i+length(rs)-1, k=findall(x->x==1, B[:, j])) >= 1)
     end
 
     @constraint(model, sum(output[i] for i=findall(x->x==0, A)) .== 0)
@@ -349,9 +349,6 @@ function cutfree(;
             end
         end
     end
-
-    
-    
 
     #=
     maximum_diversity = degeneracy(oligo)
