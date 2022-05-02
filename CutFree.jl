@@ -279,7 +279,14 @@ cutfree()
     Return a site-free random of maximum diversity (of nucleotides). This single degenerate sequence can be used to synthesize a pool of oligos with mixed bases.
 
     Example:
-    julia>
+    julia> cutfree()
+
+    NNNNNDNBNNNNNBNNNNNN
+    AAAAAAA-AAAAA-AAAAAA
+    TTTTTTTTTTTTTTTTTTTT
+    CCCCC-CCCCCCCCCCCCCC
+    GGGGGGGGGGGGGGGGGGGG
+    ("NNNNNDNBNNNNNBNNNNNN", 12.66638361673435)
 
 """
 function cutfree(;
@@ -372,10 +379,9 @@ function cutfree(;
     end
     =#
 
-    println(sites)
-
-    println(A)
-    println(B)
+    #println(sites)
+    #rintln(A)
+    #println(B)
 
     return print_oligo_block(oligo), degeneracy(oligo)
 end
