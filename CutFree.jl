@@ -341,7 +341,6 @@ function cutfree(;
     end
 
     @variable(model, output[1:15, 1:m], Bin) # Create output variable
-    #@constraint(model, sum(A .* output) == m) # Enforce output is proper length and contains valid codes
     @constraint(model, sum(output[j, i] for i in 1:m, j in findall(x->x==0, A[:, i])) .== 0) # Enforce selected codes exist within subcodes(starting_oligo)
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1) # Enforce one code selected for each position
     
