@@ -262,7 +262,7 @@ degeneracy(oligo)
     64
 """
 function degeneracy(oligo)
-    value = 1
+    value = 0
     oligo_bases = str_to_vector(oligo)
 
     for code in oligo_bases
@@ -281,24 +281,30 @@ cutfree()
     Example:
     julia> cutfree()
 
-    NNNNNDNBNNNNNBNNNNNN
-    AAAAAAA-AAAAA-AAAAAA
+    NNNNNWDNHDNHDNHDNDNN
+    AAAAAAAAAAAAAAAAAAAA
     TTTTTTTTTTTTTTTTTTTT
-    CCCCC-CCCCCCCCCCCCCC
-    GGGGGGGGGGGGGGGGGGGG
-    ("NNNNNDNBNNNNNBNNNNNN", 12.66638361673435)
+    CCCCC--CC-CC-CC-C-CC
+    GGGGG-GG-GG-GG-GGGGG
+    11.74065993802887
+    "NNNNNWDNHDNHDNHDNDNN"
 
+    julia> cutfree(min_blocks = 2)
+
+    HHHHHHHHHHHHHNHDNDDN
+    AAAAAAAAAAAAAAAAAAAA
+    TTTTTTTTTTTTTTTTTTTT
+    CCCCCCCCCCCCCCC-C--C
+    -------------G-GGGGG
+    10.91724130421815
+    "HHHHHHHHHHHHHNHDNDDN"
 """
 function cutfree(;
             starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
             restriction_sites = ["GGTCTC", "GGCCGG"],
             min_blocks = 1,
-            increase_diversity = false,
+            increase_diversity = true,
             )
-
-    # Find the maximum acheivable diversity and optimal objective value
-    # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
-    # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
 
     m = length(starting_oligo)
     sites = []
@@ -351,39 +357,48 @@ function cutfree(;
     @objective(model, Max, sum(C .* output)) # Maximize degeneracy   
     optimize!(model)
 
-    # Find oligo from output matrix
+    # Find oligo from output matrix, return empty if no possible output
     oligo = ""
     for i in 1:m, j in 1:15
-        if value.(output[j, i]) == 1
-            oligo *= names(A, 1)[j]
+        try value.(output[j, i])
+            if value.(output[j, i]) == 1
+                oligo *= names(A, 1)[j]
+            end
+        catch
+            return "No possible output with given arguments."
         end
     end
 
-    # Increase diversity of solution by randomization
+    # Increase diversity of solution
     if (increase_diversity == true)
+        # Find the maximum acheivable diversity and optimal objective value
         maximum_diversity = degeneracy(oligo)
 
+        # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
+        @constraint(model, sum(C .* output) == maximum_diversity)
+
+        # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
         D = rand(15, m)
-        for i in 1:length(findall(x->x==1, output))
-            @constraint(model, sum(degeneracy(i) for i in names(A, 1)[findall(x->x==1, output)[i][1]]) == maximum_diversity)
-        end
         @objective(model, Max, sum(D .* output))
         optimize!(model)
 
-        # Find oligo from output matrix
+        # Find oligo from output matrix, return empty if no possible output
         oligo = ""
         for i in 1:m, j in 1:15
-            if value.(output[j, i]) == 1
-                oligo *= names(A, 1)[j]
+            try value.(output[j, i])
+                if value.(output[j, i]) == 1
+                    oligo *= names(A, 1)[j]
+                end
+            catch
+                return "No possible output with given arguments."
             end
         end
     end
 
-    #println(sites)
-    #println(A)
-    #println(B)
+    print_oligo_block(oligo)
+    println(degeneracy(oligo))
 
-    return print_oligo_block(oligo), degeneracy(oligo)
+    return oligo
 end
 
 cutfree()
