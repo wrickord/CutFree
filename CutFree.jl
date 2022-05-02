@@ -290,7 +290,7 @@ cutfree()
 
 """
 function cutfree(;
-            starting_oligo = "GNNNNNNNNNNNNNNNNNNN",
+            starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
             restriction_sites = ["GGTCTC", "GGCCGG"],
             min_blocks = 1,
             increase_diversity = false,
@@ -311,10 +311,6 @@ function cutfree(;
     A = NamedArray(zeros(15, m), (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"],
         1:m), ("IUB_CODES", "Position"))
 
-    B = NamedArray(zeros(15, m*length(sites)), (["A_blocked", "C_blocked", "G_blocked", "T_blocked", "R_blocked", "Y_blocked",
-        "M_blocked", "K_blocked", "S_blocked", "W_blocked", "H_blocked", "B_blocked", "V_blocked", 
-        "D_blocked", "N_blocked"], 1:m*length(sites)), ("IUB_CODES", "Position"))
-
     for i in 1:m
         subs = subcodes(string(starting_oligo[i]))
         for b in subs
@@ -322,15 +318,19 @@ function cutfree(;
         end
     end
 
-    i = 1
+    B = []
     for rs in sites
-        for j in 1:m-length(rs)+1, k in 1:length(rs)
-            blocked = get_blocking_codes(string(rs[k]), true)
+        B_i = NamedArray(zeros(15, length(rs)), (["A_blocked", "C_blocked", "G_blocked", "T_blocked", "R_blocked", "Y_blocked",
+            "M_blocked", "K_blocked", "S_blocked", "W_blocked", "H_blocked", "B_blocked", "V_blocked", 
+            "D_blocked", "N_blocked"], 1:length(rs)), ("IUB_CODES", "Position"))
+        for j in 1:length(rs)
+            blocked = get_blocking_codes(string(rs[j]), true)
             for b in blocked
-                B[string(b, "_blocked"), i+j+k-2] = 1
+                B_i[string(b, "_blocked"), j] = 1
             end
         end
-        i += m
+
+        push!(B, B_i)
     end
     
     model = Model(Gurobi.Optimizer)
@@ -341,16 +341,12 @@ function cutfree(;
     end
 
     @variable(model, output[1:15, 1:m], Bin) # Create output variable
-    @constraint(model, sum(A .* output) == m) # Enforce output is proper length and contains valid codes
+    #@constraint(model, sum(A .* output) == m) # Enforce output is proper length and contains valid codes
     @constraint(model, sum(output[j, i] for i in 1:m, j in findall(x->x==0, A[:, i])) .== 0) # Enforce selected codes exist within subcodes(starting_oligo)
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1) # Enforce one code selected for each position
     
-    b_i = 0
-    for rs in sites
-        for i in 1:m-length(rs)+1
-            @constraint(model, sum(output[:, i:i+length(rs)-1] .* B[:, b_i+i:b_i+i+length(rs)-1]) .>= min_blocks) # Enforce presence of blocking codes
-        end
-        b_i += m
+    for rs in sites, i in 1:length(sites), j in 1:m-length(rs)+1
+        @constraint(model, sum(output[:, j:j+length(rs)-1] .* B[i]) .>= min_blocks) # Enforce presence of blocking codes
     end
     
     @objective(model, Max, sum(C .* output)) # Maximize degeneracy   
@@ -358,12 +354,9 @@ function cutfree(;
 
     # Find oligo from output matrix
     oligo = ""
-
-    for i in 1:m
-        for j in 1:15
-            if value.(output[j, i]) == 1
-                oligo *= names(A, 1)[j]
-            end
+    for i in 1:m, j in 1:15
+        if value.(output[j, i]) == 1
+            oligo *= names(A, 1)[j]
         end
     end
 
@@ -378,13 +371,11 @@ function cutfree(;
         @objective(model, Max, sum(D .* output))
         optimize!(model)
 
+        # Find oligo from output matrix
         oligo = ""
-
-        for i in 1:m
-            for j in 1:15
-                if value.(output[j, i]) == 1
-                    oligo *= names(A, 1)[j]
-                end
+        for i in 1:m, j in 1:15
+            if value.(output[j, i]) == 1
+                oligo *= names(A, 1)[j]
             end
         end
     end
@@ -392,7 +383,6 @@ function cutfree(;
     #println(sites)
     #println(A)
     #println(B)
-
 
     return print_oligo_block(oligo), degeneracy(oligo)
 end
