@@ -5,6 +5,7 @@ CutFree is a tool created to design pools of DNA barcodes compatible with restri
 Feel free to check out CutFree through the following link: https://jensenlab.shinyapps.io/cutfree/
 
 Make sure to add and build the correct packages before running the program:
+
     Pkg.add("Clp")
     Pkg.add("Gurobi")
     Pkg.add("JuMP")
