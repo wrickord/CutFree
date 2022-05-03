@@ -1,23 +1,3 @@
-import Pkg;
-
-Pkg.add("Clp")
-Pkg.add("Gurobi")
-Pkg.add("JuMP")
-Pkg.add("DataStructures")
-Pkg.add("NamedArrays")
-
-Pkg.build("Clp")
-Pkg.build("Gurobi")
-Pkg.build("JuMP")
-Pkg.build("DataStructures")
-Pkg.build("NamedArrays")
-
-Pkg.update("Clp")
-Pkg.update("Gurobi")
-Pkg.update("JuMP")
-Pkg.update("DataStructures")
-Pkg.update("NamedArrays")
-
 using Clp, Gurobi, JuMP, DataStructures, NamedArrays
 
 IUB_CODES = Dict(
@@ -55,8 +35,7 @@ get_blocking_codes(code, names)
     Any[["T"], ["C"], ["G"], ["C", "T"], ["C", "G", "T"], ["C", "G"], ["G", "T"]]
 """
 function get_blocking_codes(code, names)
-    blocking_codes = Vector()
-
+    blocking_codes = []
     for (key, value) in IUB_CODES
         if findall(x -> x in value, IUB_CODES[code]) == Int64[] && !names
             push!(blocking_codes, value)
@@ -114,11 +93,10 @@ make_oligo_block(oligo)
     ["A---", "----", "-C-C", "--G-"]
 """
 function make_oligo_block(oligo)
-    oligo_bases = str_to_vector(oligo)
     strings = Dict("A" => "", "C" => "", "G" => "", "T" => "")
 
     i = 0
-    for code in oligo_bases
+    for code in str_to_vector(oligo)
         for base in IUB_CODES[code]
             for (key, value) in strings
                 if (key == base)
@@ -156,8 +134,6 @@ print_oligo_block(oligo)
 function print_oligo_block(oligo)
     println(oligo * "\n" * make_oligo_block(oligo)[1] * "\n" * make_oligo_block(oligo)[2]
     * "\n" * make_oligo_block(oligo)[3] * "\n" * make_oligo_block(oligo)[4])
-
-    return string(oligo)
 end
 
 """
@@ -173,7 +149,6 @@ subcodes(code)
 """
 function subcodes(code)
     codes = ""
-
     for (key, value) in IUB_CODES
         if (issubset(value, IUB_CODES[code]))
             codes *= key
@@ -195,16 +170,10 @@ complement(oligo)
     ["D", "T"]
 """
 function complement(oligo)
-    codes = ""
-    oligo_bases = str_to_vector(oligo)
-    base_comps = Dict(
-        "A" => "T", 
-        "C" => "G", 
-        "G" => "C", 
-        "T" => "A",
-    )
+    base_comps = Dict("A" => "T", "C" => "G", "G" => "C", "T" => "A")
 
-    for code in oligo_bases
+    codes = ""
+    for code in str_to_vector(oligo)
         temp = ""
         for base in IUB_CODES[code]
             temp *= base_comps[base]
@@ -254,18 +223,16 @@ end
 degeneracy(oligo)
 
     Description:
-    Return the number of sequences in a degenerate oligo.
+    Return the log of the number of sequences in a degenerate oligo.
 
     Example:
     julia> println(degeneracy("NNN"))
 
-    64
+    4.1588830833596715
 """
 function degeneracy(oligo)
     value = 0
-    oligo_bases = str_to_vector(oligo)
-
-    for code in oligo_bases
+    for code in str_to_vector(oligo)
         value += log(length(IUB_CODES[code]))
     end
 
@@ -307,8 +274,8 @@ function cutfree(;
             )
 
     m = length(starting_oligo)
-    sites = []
 
+    sites = []
     for i in 1:size(restriction_sites)[1]
         push!(sites, expand_asymmetric(restriction_sites[i])[1])
         push!(sites, expand_asymmetric(restriction_sites[i])[2])
@@ -316,7 +283,6 @@ function cutfree(;
 
     A = NamedArray(zeros(15, m), (["A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N"],
         1:m), ("IUB_CODES", "Position"))
-
     for i in 1:m
         subs = subcodes(string(starting_oligo[i]))
         for b in subs
@@ -357,6 +323,17 @@ function cutfree(;
     @objective(model, Max, sum(C .* output)) # Maximize degeneracy   
     optimize!(model)
 
+    # Increase diversity of solution
+    if (increase_diversity == true)
+        # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
+        @constraint(model, sum(C .* output) == objective_value(model))
+
+        # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
+        D = rand(15, m)
+        @objective(model, Max, sum(D .* output))
+        optimize!(model)
+    end
+
     # Find oligo from output matrix, return empty if no possible output
     oligo = ""
     for i in 1:m, j in 1:15
@@ -369,36 +346,8 @@ function cutfree(;
         end
     end
 
-    # Increase diversity of solution
-    if (increase_diversity == true)
-        # Find the maximum acheivable diversity and optimal objective value
-        maximum_diversity = degeneracy(oligo)
-
-        # Run CutFree with a constraint addeed requiring the solution to be equal to the optimal objective value
-        @constraint(model, sum(C .* output) == maximum_diversity)
-
-        # Change objective function to the sum of all variables multiplied by random coefficients (randomize)
-        D = rand(15, m)
-        @objective(model, Max, sum(D .* output))
-        optimize!(model)
-
-        # Find oligo from output matrix, return empty if no possible output
-        oligo = ""
-        for i in 1:m, j in 1:15
-            try value.(output[j, i])
-                if value.(output[j, i]) == 1
-                    oligo *= names(A, 1)[j]
-                end
-            catch
-                return "No possible output with given arguments."
-            end
-        end
-    end
-
     print_oligo_block(oligo)
     println(degeneracy(oligo))
 
     return oligo
 end
-
-#cutfree(starting_oligo = "GNGNNNYBDKVDNGCTNNNNN", restriction_sites = ["GGTCTC", "GGCCGG"], min_blocks = 1, increase_diversity = true)
