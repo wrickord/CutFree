@@ -266,7 +266,7 @@ function degeneracy(oligo)
     oligo_bases = str_to_vector(oligo)
 
     for code in oligo_bases
-        value += log10(length(IUB_CODES[code]))
+        value += log(length(IUB_CODES[code]))
     end
 
     return value
@@ -289,15 +289,15 @@ cutfree()
     11.74065993802887
     "NNNNNWDNHDNHDNHDNDNN"
 
-    julia> cutfree(min_blocks = 2)
+    julia> cutfree(starting_oligo = "GNGNNNYBDKVDNGCTNNNNN", restriction_sites = ["GGTCTC", "GGCCGG"], min_blocks = 1, increase_diversity = true)
 
-    HHHHHHHHHHHHHNHDNDDN
-    AAAAAAAAAAAAAAAAAAAA
-    TTTTTTTTTTTTTTTTTTTT
-    CCCCCCCCCCCCCCC-C--C
-    -------------G-GGGGG
-    10.91724130421815
-    "HHHHHHHHHHHHHNHDNDDN"
+    GNGNDNYKWKVDNGCTNNNNN
+    -A-AAA--A-AAA---AAAAA
+    -T-TTTTTTT-TT--TTTTTT
+    -C-C-CC---C-C-C-CCCCC
+    GGGGGG-G-GGGGG--GGGGG
+    18.545074838323124
+    "GNGNDNYKWKVDNGCTNNNNN"
 """
 function cutfree(;
             starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
@@ -343,7 +343,7 @@ function cutfree(;
 
     C = zeros(15, m) # Degeneracy matrix
     for i in 1:15, j in 1:m
-        C[i, j] = log10(length(IUB_CODES[names(A,1)[i]])) # Assign degeneracy values to matrix
+        C[i, j] = log(length(IUB_CODES[names(A,1)[i]])) # Assign degeneracy values to matrix
     end
 
     @variable(model, output[1:15, 1:m], Bin) # Create output variable
@@ -401,4 +401,4 @@ function cutfree(;
     return oligo
 end
 
-cutfree()
+#cutfree(starting_oligo = "GNGNNNYBDKVDNGCTNNNNN", restriction_sites = ["GGTCTC", "GGCCGG"], min_blocks = 1, increase_diversity = true)
