@@ -6,6 +6,8 @@ Feel free to check out CutFree through the following link: https://jensenlab.shi
 
 Make sure to add and build the correct packages before running the program:
 
+    import Pkg
+    
     Pkg.add("Clp")
     Pkg.add("Gurobi")
     Pkg.add("JuMP")
