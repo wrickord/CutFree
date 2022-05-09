@@ -351,5 +351,3 @@ function cutfree(;
 
     return oligo
 end
-
-cutfree()
