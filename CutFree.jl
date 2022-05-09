@@ -1,4 +1,4 @@
-using Clp, Gurobi, JuMP, DataStructures, NamedArrays
+using Clp, Gurobi, GLPK, JuMP, DataStructures, NamedArrays
 
 IUB_CODES = Dict(
     "A" => ["A"], 
@@ -253,7 +253,7 @@ cutfree()
     TTTTTTTTTTTTTTTTTTTT
     CCCCC--CC-CC-CC-C-CC
     GGGGG-GG-GG-GG-GGGGG
-    11.74065993802887
+    24.731283462223622
     "NNNNNWDNHDNHDNHDNDNN"
 
     julia> cutfree(starting_oligo = "GNGNNNYBDKVDNGCTNNNNN", restriction_sites = ["GGTCTC", "GGCCGG"], min_blocks = 1, increase_diversity = true)
@@ -305,7 +305,7 @@ function cutfree(;
         push!(B, B_i)
     end
     
-    model = Model(Gurobi.Optimizer)
+    model = Model(Gurobi.Optimizer) # Gurobi can be changed to any open source solver you wish to use
 
     C = zeros(15, m) # Degeneracy matrix
     for i in 1:15, j in 1:m
@@ -351,3 +351,5 @@ function cutfree(;
 
     return oligo
 end
+
+cutfree()
