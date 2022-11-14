@@ -1,4 +1,6 @@
-if update == true
+setup = false
+
+if setup == true
     import Pkg
     
     Pkg.add("Clp")
@@ -21,8 +23,11 @@ if update == true
     Pkg.update("JuMP")
     Pkg.update("DataStructures")
     Pkg.update("NamedArrays")
+end
+
+include("CutFree.jl")
 
 starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
 restriction_sites = ["GGTCTC", "GGCCGG"]
 
-CutFree.CutFree(starting_oligo, restriction_sites)
+cutfree(starting_oligo, restriction_sites)

@@ -1,5 +1,3 @@
-
-
 import Base: *, sort
 using Random, Statistics, DataFrames, CSV
 using BioSequences, XLSX,ArgParse
