@@ -1,33 +1,25 @@
-setup = false
+setup = false # change to true for your first run
 
-if setup == true
+if setup
     import Pkg
     
-    Pkg.add("Clp")
-    Pkg.add("Gurobi")
-    Pkg.add("GLPK")
-    Pkg.add("JuMP")
-    Pkg.add("DataStructures")
-    Pkg.add("NamedArrays")
-
-    Pkg.build("Clp")
-    Pkg.build("Gurobi")
-    Pkg.build("GLPK")
-    Pkg.build("JuMP")
-    Pkg.build("DataStructures")
-    Pkg.build("NamedArrays")
-
-    Pkg.update("Clp")
-    Pkg.update("Gurobi")
-    Pkg.update("GLPK")
-    Pkg.update("JuMP")
-    Pkg.update("DataStructures")
-    Pkg.update("NamedArrays")
+    packages = ["Clp", "Gurobi", "GLPK", "JuMP", "DataStructures", 
+    "NamedArrays", "DataFrames", "CSV", "BioSequences", "XLSX", "ArgParse"]
+    for package in packages
+        Pkg.add(package)
+        Pkg.build(package)
+        Pkg.update(package)
+    end
 end
 
 include("CutFree.jl")
+# include("CutFreeRL.jl")
 
-starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
-restriction_sites = ["GGTCTC", "GGCCGG"]
+function main()
+    starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
+    restriction_sites = ["GGTCTC", "GGCCGG"]
 
-cutfree(starting_oligo, restriction_sites)
+    cutfree(starting_oligo, restriction_sites)
+end
+
+main()

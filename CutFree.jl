@@ -148,6 +148,7 @@ subcodes(code)
     ["A", "W", "T", "C", "Y", "M", "H"]
 """
 function subcodes(code)
+    
     codes = ""
     for (key, value) in IUB_CODES
         if (issubset(value, IUB_CODES[code]))
@@ -272,6 +273,8 @@ function cutfree(
             min_blocks = 1,
             increase_diversity = true,
             )
+    
+    starting_oligo = join(map(x -> isspace(starting_oligo[x]) ? "" : starting_oligo[x], 1:length(starting_oligo)))
 
     m = length(starting_oligo)
 
