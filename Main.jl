@@ -7,7 +7,7 @@ main()
     Run simulations.
 """
 function main()
-    Pkg.activate("venv")
+    Pkg.activate("cutfree-venv")
     
     include("CutFree.jl")
     include("CutFreeRL.jl")

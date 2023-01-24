@@ -7,7 +7,7 @@ main()
     Run simulations using your command line.
 """
 function CutFreeCMD(starting_oligo::String, restriction_sites::Vector{String}, min_blocks::Int64, increase_diversity::Bool)
-    Pkg.activate("venv")
+    Pkg.activate("cutfree-venv")
 
     include("CutFree.jl")
     include("CutFreeRL.jl")
