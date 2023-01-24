@@ -55,16 +55,3 @@ function main()
 end
 
 main()
-
-
-function CutFreeCMD(starting_oligo::String, restriction_sites::Vector{String}, min_blocks::Int64, increase_diversity::Bool)
-    CutFree_out = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    print("Time: ", CutFree_out.time, " seconds")
-end
-
-starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
-restriction_sites = ["GGTCTC", "GGCCGG"]
-min_blocks = 1
-increase_diversity = true
-
-CutFreeCMD(starting_oligo, restriction_sites, min_blocks, increase_diversity)
