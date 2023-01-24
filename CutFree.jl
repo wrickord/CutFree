@@ -319,8 +319,8 @@ function cutfree(
     @constraint(model, sum(output[j, i] for i in 1:m, j in findall(x->x==0, A[:, i])) .== 0) # Enforce selected codes exist within subcodes(starting_oligo)
     @constraint(model, sum(output[i, 1:m] for i=1:15) .<= 1) # Enforce one code selected for each position
     
-    for rs in sites, i in 1:length(sites), j in 1:m-length(rs)+1
-        @constraint(model, sum(output[:, j:j+length(rs)-1] .* B[i]) .>= min_blocks) # Enforce presence of blocking codes
+    for rs in sites, j in 1:m-length(rs)+1
+        @constraint(model, sum(output[:, j:j+length(rs)-1] .* B[findall(x->x==rs, sites)[1]]) .>= min_blocks) # Enforce presence of blocking codes
     end
     
     @objective(model, Max, sum(C .* output)) # Maximize degeneracy   
