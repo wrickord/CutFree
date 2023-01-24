@@ -9,7 +9,7 @@ main()
 function main()
     Pkg.activate("cutfree-venv")
     Pkg.instantiate()
-    
+
     include("CutFree.jl")
     include("CutFreeRL.jl")
 
@@ -19,10 +19,10 @@ function main()
     increase_diversity = true
 
     CutFree_out = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    print("Time: ", CutFree_out.time, " seconds")
+    println("Time: ", CutFree_out.time, " seconds")
     
-    # CutFreeRL_out = @timed CutFreeRL(starting_oligo, restriction_sites)
-    # print("Time: ", CutFreeRL_out.time, " seconds")
+    CutFreeRL_out = @timed CutFreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    println("Time: ", CutFreeRL_out.time, " seconds")
 end
 
 main()
