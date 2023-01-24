@@ -267,7 +267,7 @@ cutfree()
     18.545074838323124
     "GNGNDNYKWKVDNGCTNNNNN"
 """
-function cutfree(
+function CutFree(
             starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
             restriction_sites = ["GGTCTC", "GGCCGG"],
             min_blocks = 1,
