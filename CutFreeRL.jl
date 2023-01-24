@@ -277,45 +277,45 @@ function random_subset(data;size=10)
     end 
 end
 
-function parse_commandline()
-    s = ArgParseSettings()
+# function parse_commandline()
+#     s = ArgParseSettings()
 
-    @add_arg_table s begin
-        "--sequence","-s"
-            help="Starting DNA sequence that should be blocked from containing restriction sites. To generate a set of barcodes with the highest diversity, start with a string of N's the length of your oligo. "
-            required=true   
-        "--restrictionsites","-r"
-            help = "Sequences to block from the oligo pools. Separate multiple sequences by commas. Do not include spaces."
-            required=true
-        "--nsims","-n"
-            help = "Number of simulations per rollout"
-            arg_type= Int
-            default=100
-    end
+#     @add_arg_table s begin
+#         "--sequence","-s"
+#             help="Starting DNA sequence that should be blocked from containing restriction sites. To generate a set of barcodes with the highest diversity, start with a string of N's the length of your oligo. "
+#             required=true   
+#         "--restrictionsites","-r"
+#             help = "Sequences to block from the oligo pools. Separate multiple sequences by commas. Do not include spaces."
+#             required=true
+#         "--nsims","-n"
+#             help = "Number of simulations per rollout"
+#             arg_type= Int
+#             default=100
+#     end
 
-    return parse_args(s)
-end
+#     return parse_args(s)
+# end
 
-function main()
-    parsed_args = parse_commandline()
-    println("Parsed args:")
-    for (arg,val) in parsed_args
-        println("  $arg  =>  $val")
-    end
-
-
-    sequence=parsed_args["sequence"]
-    sites=parsed_args["restrictionsites"]
-    nsims=parsed_args["nsims"]
-    sequence=LongDNA{4}.(sequence)
-    sites=LongDNA{4}.(split(sites,","))
-    randomer=CutFreeRL(sequence,sites;nsims=nsims)
-    randomer=String(randomer)
-    show(stdout,"text/plain",randomer)
-    println("\n")
-end
+# function main()
+#     parsed_args = parse_commandline()
+#     println("Parsed args:")
+#     for (arg,val) in parsed_args
+#         println("  $arg  =>  $val")
+#     end
 
 
-main()
+#     sequence=parsed_args["sequence"]
+#     sites=parsed_args["restrictionsites"]
+#     nsims=parsed_args["nsims"]
+#     sequence=LongDNA{4}.(sequence)
+#     sites=LongDNA{4}.(split(sites,","))
+#     randomer=CutFreeRL(sequence,sites;nsims=nsims)
+#     randomer=String(randomer)
+#     show(stdout,"text/plain",randomer)
+#     println("\n")
+# end
+
+
+# main()
 
 
