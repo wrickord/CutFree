@@ -8,6 +8,7 @@ main()
 """
 function main()
     Pkg.activate("cutfree-venv")
+    Pkg.instantiate()
     
     include("CutFree.jl")
     include("CutFreeRL.jl")
