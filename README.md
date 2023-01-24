@@ -11,11 +11,29 @@ Download Julia from the following link: https://julialang.org/downloads/
 
 When installing Julia, ensure you click "Add to Path" for proper functionality.
 
+Alternative download for MacOS in terminal:
+```
+brew install cask
+brew install julia --cask
+```
+
+### Download Gurobi
+Download Gurobi from the following link: https://www.gurobi.com/downloads/
+
+After installing Gurobi, make sure to activate your key in the command line using the instructions provided.
+
 ### Clone Repository
 Clone this repository.
-
 ```
 git clone "https://github.com/wrickord/CutFree.git"
+```
+
+### Changing the Model
+In addition to using the Gurobi MILP optimization tool, CutFree's implementation makes it convenient to utilize open-source optimizers, such as GLPK.
+
+Simply install your open-source optimizer of choice, add "Using OPTIMIZER_NAME" (where OPTIMIZER_NAME=GLPK, for example) to the top of CutFree.jl, nagivate to **line 311 of CutFree.jl**, and change "Gurobi" to the name of your optimizer.
+```
+model = Model(GLPK.Optimizer)
 ```
 
 ### CutFree in Julia
@@ -24,7 +42,7 @@ Straightforward.
 ### CutFree in the Command Line
 To use CutFree in the command line, follow the steps below.
 
-Open command prompt and navigate to the cloned repository.
+Open command prompt/terminal and navigate to the cloned repository.
 ```
 cd "ADD/PATH/HERE/CutFree"
 ```
