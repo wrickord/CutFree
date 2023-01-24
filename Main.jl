@@ -14,7 +14,7 @@ main()
 """
 function main()
     starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
-    restriction_sites = ["GGTCTC", "GGCCGG", "GATGTC", "ATCGAGCCGG", "TCAGTCTC", "GGCG"]
+    restriction_sites = ["GGTCTC", "GGCCGG"]
     min_blocks = 1
     increase_diversity = true
 
