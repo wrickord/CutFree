@@ -10,19 +10,21 @@ include("CutFreeRL.jl")
 main()
 
     Description:
-    Run simulations.
+    Run CutFree simulations.
 """
 function main()
     starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
-    restriction_sites = ["GGTCTC", "GGCCGG"]
+    restriction_sites = ["GGTCTC", "GGCCGG", "GATGTC", "ATCGAGCCGG", "TCAGTCTC", "GGCG"]
     min_blocks = 1
     increase_diversity = true
 
-    CutFree_out = @timed CutFree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    println("Time: ", CutFree_out.time, " seconds")
+    cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
+    println("Time: ", cutfree_output.time, " seconds")
+    println("Randomer: ", cutfree_output.value)
     
-    # CutFreeRL_out = @timed CutFreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
-    # println("Time: ", CutFreeRL_out.time, " seconds")
+    # cutfreeRL_output = @timed CutFreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    # println("Time: ", cutfreeRL_output.time, " seconds")
+    # println("Randomer: ", cutfreeRL_output.value)
 end
 
 main()
