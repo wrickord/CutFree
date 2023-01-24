@@ -1,5 +1,11 @@
 import Pkg
 
+Pkg.activate("cutfree-venv")
+Pkg.instantiate()
+
+include("CutFree.jl")
+include("CutFreeRL.jl")
+
 """
 main()
 
@@ -7,12 +13,6 @@ main()
     Run simulations using your command line.
 """
 function CutFreeCMD(starting_oligo::String, restriction_sites::Vector{String}, min_blocks::Int64, increase_diversity::Bool)
-    Pkg.activate("cutfree-venv")
-    Pkg.instantiate()
-
-    include("CutFree.jl")
-    include("CutFreeRL.jl")
-
     CutFree_out = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
     print("Time: ", CutFree_out.time, " seconds")
 end
