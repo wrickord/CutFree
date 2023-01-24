@@ -205,6 +205,77 @@ function CutFreeRL(sequence::LongSequence{DNAAlphabet{4}}, sites::Array{LongSequ
     return randomer
 end
 
+"""
+    CutFreeRL(sequence::String, sites::Vector{String}; simulate=simulate_random, kwargs...)
+
+Run the rollout algorithm to solve the CutFree MDP. 
+
+# Arguments 
+- `sequence`: Starting DNA sequence that should be blocked from containing restriction sites. To generate a set of barcodes with the highest diversity, start with a string of N's the length of your oligo. Option is given because some companies restrict which degernate bases are allowed.
+- `sites`: A vector of restriciton enzyme recognition sequences to be blocked in the random barcode. 
+- `simulate`: The choice of policy for rollout simulations. simulate_random will use a random rollout policy. simulate_greedy will use a greedy 1 step lookahead policy. 
+#Optional Keyword Arugments 
+- `nsims`: The number of rollout simulations per action
+"""
+function CutFreeRL(sequence::String, sites::Vector{String}; simulate=simulate_random, kwargs...)
+    # Convert strings to Biosequence Objects 
+    sequence=LongSequence{DNAAlphabet{4}}(sequence)
+    sites=LongSequence{DNAAlphabet{4}}.(sites)
+    # Initialize bases and solution 
+    allowedbasedict=Dict(DNA_A => dna"A", DNA_T => dna"T", DNA_C => dna"C", DNA_G => dna"G",DNA_R =>dna"AG",DNA_Y=>dna"CT",DNA_S=>dna"GC",
+    DNA_W=>dna"AT",DNA_K=>dna"GT",DNA_M=>dna"AC",DNA_B=>dna"CGTYSKB",DNA_D=>dna"AGTRWKD",DNA_H=>dna"ACTYWMH",DNA_V=>dna"ACGRSMV",DNA_N=>dna"ACGTRYSWKMBDHVN",DNA_Gap=>dna"-")
+    bases=[dna"-" for i=1:length(sequence)]
+    for i in eachindex(sequence)
+        bases[i]=allowedbasedict[sequence[i]]
+    end 
+    n = length(bases)
+    randomer = dna"-" ^ n
+
+    # If the restriction site is non-palindromic, we also need to block
+    # the reverse complement.
+    for i = 1:length(sites)
+        if ~ispalindromic(sites[i])
+            push!(sites, reverse_complement(sites[i]))
+        end
+    end
+
+    # Find the longest restriction site and use this as the horizon.
+    max_len = map(length, sites) |> maximum
+    horizon = max_len
+
+    for i = 1:n
+        best_base = DNA_Gap
+        best_deg = -1.0
+        start = max(i - max_len, 1) # only need to look back max_len when checking the oligos
+        for base in bases[i]
+            if ~isvalid(randomer[start:i-1] * base, sites)
+                # adding this bases creates a restriction site; skip it
+                continue
+            end
+            deg = simulate(randomer[start:i-1] * base, bases[i+1:end], sites; horizon=horizon, kwargs...)
+
+            # Update use this base if:
+            #   1. the mean randomer degeneracy is higher than the previous best, OR
+            #   2. the randomer degeneracy is tied with the previous best, but the new base has
+            #      higher individual degeneracy
+            if deg > best_deg || (deg == best_deg && degeneracy(base) > degeneracy(best_base))
+                best_deg = deg
+                best_base = base
+            end
+        end
+
+        if best_base == DNA_Gap
+            # The sequence has terminated; there are no bases that can be added without making
+            # a restriction site.
+            break
+        else
+            randomer[i] = best_base
+        end
+    end
+
+    return randomer
+end
+
 #= Test code
 sequence=dna"NNNNNNNNNNNNNNNNNNNN"
 sites = [dna"GGTCTC"] # BsaI
