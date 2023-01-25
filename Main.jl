@@ -19,7 +19,7 @@ function main()
     increase_diversity = true
 
     cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    cutfreeRL_output = @timed CutFreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    cutfreeRL_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
 
     println("\nCutFree Time: ", cutfree_output.time, " seconds")
     println("CutFree Randomer: ", cutfree_output.value)
