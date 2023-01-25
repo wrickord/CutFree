@@ -1,9 +1,9 @@
 import Pkg
 
-using Suppressor
-
 Pkg.activate("cutfree-venv")
 Pkg.instantiate()
+
+using Suppressor
 
 include("CutFree.jl")
 include("CutFreeRL.jl")
