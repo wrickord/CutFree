@@ -235,7 +235,7 @@ function CutFreeRL(sequence::String, sites::Vector{String}; simulate=simulate_ra
     # the reverse complement.
     for i = 1:length(sites)
         if ~ispalindromic(sites[i])
-            push!(sites, reverse_complement(sites[i]))
+            push!(sites, BioSequences.reverse_complement(sites[i]))
         end
     end
 

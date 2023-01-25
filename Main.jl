@@ -21,8 +21,8 @@ function main()
     CutFree_out = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
     print("Time: ", CutFree_out.time, " seconds")
     
-    # CutFreeRL_out = @timed CutFreeRL(starting_oligo, restriction_sites)
-    # print("Time: ", CutFreeRL_out.time, " seconds")
+    CutFreeRL_out = @timed CutFreeRL(starting_oligo, restriction_sites)
+    print("Time: ", CutFreeRL_out.time, " seconds")
 end
 
 main()
