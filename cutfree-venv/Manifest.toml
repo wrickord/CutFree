@@ -522,6 +522,11 @@ git-tree-sha1 = "46da2434b41f41ac3594ee9816ce5541c6096123"
 uuid = "892a3eda-7b42-436c-8928-eab12a02cf0e"
 version = "0.3.0"
 
+[[deps.Suppressor]]
+git-tree-sha1 = "c6ed566db2fe3931292865b966d6d140b7ef32a9"
+uuid = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
+version = "0.2.1"
+
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"

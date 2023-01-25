@@ -1,5 +1,7 @@
 import Pkg
 
+using Suppressor
+
 Pkg.activate("cutfree-venv")
 Pkg.instantiate()
 
@@ -17,6 +19,12 @@ function main()
     restriction_sites = ["GGTCTC", "GGCCGG"]
     min_blocks = 1
     increase_diversity = true
+
+    # compile functions while supressing outputs
+    @suppress_out begin
+        @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
+        @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    end
 
     cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
     cutfreeRL_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
