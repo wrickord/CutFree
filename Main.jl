@@ -19,12 +19,16 @@ function main()
     increase_diversity = true
 
     cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    println("Time: ", cutfree_output.time, " seconds")
-    println("Randomer: ", cutfree_output.value)
-    
-    # cutfreeRL_output = @timed CutFreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
-    # println("Time: ", cutfreeRL_output.time, " seconds")
-    # println("Randomer: ", cutfreeRL_output.value)
+    cutfreeRL_output = @timed CutFreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+
+    println("\nCutFree Time: ", cutfree_output.time, " seconds")
+    println("CutFree Randomer: ", cutfree_output.value)
+    println("CutFree Degeneracy: ", degeneracy(cutfree_output.value))
+
+    println("\nCutFreeRL Time: ", cutfreeRL_output.time, " seconds")
+    println("CutFreeRL Randomer: ", cutfreeRL_output.value)
+    println("CutFreeRL Degeneracy: ", degeneracy(cutfreeRL_output.value))
+
 end
 
 main()
