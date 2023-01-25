@@ -11,10 +11,10 @@ Download Julia from the following link: https://julialang.org/downloads/
 
 When installing Julia, ensure you click "Add to Path" for proper functionality.
 
-Alternative download for MacOS in terminal:
+Add to path command for MacOS (may need to change version number).
 ```
-brew install cask
-brew install julia --cask
+rm -f /usr/local/bin/julia
+ln -s /Applications/Julia-1.8.app/Contents/Resources/julia/bin/julia /usr/local/bin/julia
 ```
 
 ### Download Gurobi
