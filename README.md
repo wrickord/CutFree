@@ -11,7 +11,7 @@ Download Julia from the following link: https://julialang.org/downloads/
 
 When installing Julia, ensure you click "Add to Path" for proper functionality.
 
-Add to path command for MacOS (may need to change version number).
+Add to path command for MacOS terminal (may need to change version number).
 ```
 rm -f /usr/local/bin/julia
 ln -s /Applications/Julia-1.8.app/Contents/Resources/julia/bin/julia /usr/local/bin/julia
