@@ -32,6 +32,8 @@ git clone "https://github.com/wrickord/CutFree.git"
 In addition to using the Gurobi MILP optimization tool, CutFree's implementation makes it convenient to utilize open-source optimizers, such as GLPK (download included in cutfree-venv).
 
 Simply install your open-source optimizer of choice, add "Using OPTIMIZER_NAME" (where OPTIMIZER_NAME=GLPK, for example) to the top of CutFree.jl, nagivate to **line 311 of CutFree.jl**, and change "Gurobi" to the name of your optimizer.
+
+Example:
 ```
 model = Model(GLPK.Optimizer)
 ```
