@@ -29,14 +29,15 @@ function main()
     cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
     cutfreeRL_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
 
-    println("\nCutFree Time: ", cutfree_output.time, " seconds")
-    println("CutFree Randomer: ", cutfree_output.value)
+    println("\nCutFree Randomer: ")
+    print_oligo_block(cutfree_output.value)
     println("CutFree Degeneracy: ", degeneracy(cutfree_output.value))
+    println("CutFree Time: ", cutfree_output.time, " seconds")
 
-    println("\nCutFreeRL Time: ", cutfreeRL_output.time, " seconds")
-    println("CutFreeRL Randomer: ", cutfreeRL_output.value)
-    println("CutFreeRL Degeneracy: ", degeneracy(cutfreeRL_output.value))
-
+    println("\nCutFreeRL Randomer: ")
+    print_oligo_block(String(cutfreeRL_output.value))
+    println("CutFreeRL Degeneracy: ", degeneracy(String(cutfreeRL_output.value)))
+    println("CutFreeRL Time: ", cutfreeRL_output.time, " seconds")
 end
 
 main()

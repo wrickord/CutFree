@@ -349,8 +349,5 @@ function cutfree(
         end
     end
 
-    print_oligo_block(oligo)
-    println(degeneracy(oligo))
-
     return oligo
 end

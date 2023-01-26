@@ -217,7 +217,7 @@ Run the rollout algorithm to solve the CutFree MDP.
 #Optional Keyword Arugments 
 - `nsims`: The number of rollout simulations per action
 """
-function cutfreeRL(sequence::String, sites::Vector{SubString{String}}; simulate=simulate_random, kwargs...)
+function cutfreeRL(sequence::String, sites::Any; simulate=simulate_random, kwargs...)
     # Convert strings to Biosequence Objects 
     sequence=LongSequence{DNAAlphabet{4}}(sequence)
     sites=LongSequence{DNAAlphabet{4}}.(sites)
