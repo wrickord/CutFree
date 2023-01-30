@@ -268,10 +268,10 @@ cutfree()
     "GNGNDNYKWKVDNGCTNNNNN"
 """
 function cutfree(
-            starting_oligo = "NNNNNNNNNNNNNNNNNNNN",
-            restriction_sites = ["GGTCTC", "GGCCGG"],
+            starting_oligo::String,
+            restriction_sites::Any,
             min_blocks = 1,
-            increase_diversity = true
+            increase_diversity = false
             )
     
     starting_oligo = join(map(x -> isspace(starting_oligo[x]) ? "" : starting_oligo[x], 1:length(starting_oligo)))

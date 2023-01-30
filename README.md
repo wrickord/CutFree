@@ -2,6 +2,10 @@
 
 CutFree is a tool created to design pools of DNA barcodes compatible with restriction enzymes.
 
+## CutFree Paper: https://pubmed.ncbi.nlm.nih.gov/28865135/
+
+## CutFreeRL Paper: https://pubmed.ncbi.nlm.nih.gov/35143615/
+
 ## CutFree GUI: https://jensenlab.shinyapps.io/cutfree/
 
 ## Instructions for Use
