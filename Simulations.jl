@@ -50,7 +50,7 @@ write_output(oligo, sites)
     Description:
     Record all simulation results and output to CSV file.
 """
-function write_output(oligo, sites)
+function write_output(oligo, sites, clear_csv)
     cutfree_output = @timed cutfree(oligo, sites, 1, true)
     cutfreeRL_output = @timed cutfreeRL(oligo, sites, simulate=simulate_random, nsims=1000)
 
@@ -58,18 +58,22 @@ function write_output(oligo, sites)
     output = DataFrame(
         Oligo = oligo,
         OligoLength = length(oligo),
-        Sites = sites,
+        Sites = [sites],
         TotalSites = length(sites),
         SiteLength = length(sites[1]),
         CutFree_Randomer = String(cutfree_output.value),
         CutFree_Degeneracy = degeneracy(String(cutfree_output.value)),
-        CutFree_Time = cutfreeRL_output.time,
+        CutFree_Time = cutfree_output.time,
         CutFreeRL_Randomer = String(cutfreeRL_output.value),
         CutFreeRL_Degeneracy = degeneracy(String(cutfreeRL_output.value)),
         CutFreeRL_Time = cutfreeRL_output.time,
     )
 
-    CSV.write(file, output, append=true)
+    if clear_csv
+        CSV.write(file, output, append=false)
+    else
+        CSV.write(file, output, append=true)
+    end
 end
 
 """
@@ -90,10 +94,17 @@ main()
     Run simulations.
 """
 function main()
-    blocking_sites = read_restriction_sites("rebase_data.csv", 6, true)
-    oligos = get_oligos(6, 10)
+    oligos = get_oligos(6, 40)
+    
+    clear_csv = true
     for oligo in oligos
-        write_output(oligo, [blocking_sites[1]])
+        for site_num in 1:10
+            for site_length in 4:8
+                blocking_sites = read_restriction_sites("rebase_data.csv", site_length, true)
+                write_output(oligo, blocking_sites[1:site_num], clear_csv)
+                clear_csv = false
+            end
+        end
     end
 end
 
