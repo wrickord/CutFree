@@ -3,7 +3,7 @@ import Pkg
 Pkg.activate("cutfree-venv")
 Pkg.instantiate()
 
-using CSV, DataFrames
+using CSV, DataFrames, StatsBase
 
 include("CutFree.jl")
 include("CutFreeRL.jl")
@@ -95,13 +95,13 @@ main()
 """
 function main()
     oligos = get_oligos(6, 40)
-    
+
     clear_csv = true
     for oligo in oligos
         for site_num in 1:10
             for site_length in 4:8
-                blocking_sites = read_restriction_sites("rebase_data.csv", site_length, true)
-                write_output(oligo, blocking_sites[1:site_num], clear_csv)
+                blocking_sites = unique(read_restriction_sites("rebase_data.csv", site_length, true))
+                write_output(oligo, sample(blocking_sites, site_num, replace=false), clear_csv)
                 clear_csv = false
             end
         end
