@@ -94,15 +94,18 @@ main()
     Run simulations.
 """
 function main()
+    num_samples = 3
     oligos = get_oligos(6, 40)
 
     clear_csv = true
-    for oligo in oligos
-        for site_num in 1:10
+    for _ in 1:num_samples
+        for oligo in oligos
             for site_length in 4:8
-                blocking_sites = unique(read_restriction_sites("rebase_data.csv", site_length, true))
-                write_output(oligo, sample(blocking_sites, site_num, replace=false), clear_csv)
-                clear_csv = false
+                for site_num in 1:10
+                    blocking_sites = unique(read_restriction_sites("rebase_data.csv", site_length, true))
+                    write_output(oligo, sample(blocking_sites, site_num, replace=false), clear_csv)
+                    clear_csv = false
+                end
             end
         end
     end
