@@ -62,10 +62,10 @@ function write_output(oligo, sites, clear_csv)
         TotalSites = length(sites),
         SiteLength = length(sites[1]),
         CutFree_Randomer = String(cutfree_output.value),
-        CutFree_Degeneracy = degeneracy(String(cutfree_output.value)),
+        CutFree_Degeneracy = get_degeneracy(String(replace(cutfree_output.value, "-" => ""))),
         CutFree_Time = cutfree_output.time,
         CutFreeRL_Randomer = String(cutfreeRL_output.value),
-        CutFreeRL_Degeneracy = degeneracy(String(cutfreeRL_output.value)),
+        CutFreeRL_Degeneracy = degeneracy(String(replace(cutfree_output.value, "-" => ""))),
         CutFreeRL_Time = cutfreeRL_output.time,
     )
 
@@ -94,10 +94,9 @@ main()
     Run simulations.
 """
 function main()
+    clear_csv = true
     num_samples = 3
     oligos = get_oligos(6, 40)
-
-    clear_csv = true
     for _ in 1:num_samples
         for oligo in oligos
             for site_length in 4:8

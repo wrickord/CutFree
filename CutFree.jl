@@ -221,17 +221,17 @@ function expand_asymmetric(oligo)
 end
 
 """
-degeneracy(oligo)
+get_degeneracy(oligo)
 
     Description:
     Return the log of the number of sequences in a degenerate oligo.
 
     Example:
-    julia> println(degeneracy("NNN"))
+    julia> println(get_degeneracy("NNN"))
 
     4.1588830833596715
 """
-function degeneracy(oligo)
+function get_degeneracy(oligo)
     value = 0
     for code in str_to_vector(oligo)
         value += log(length(IUB_CODES[code]))
