@@ -62,12 +62,12 @@ function main()
 
     println("\nCutFree Randomer: ")
     print_oligo_block(String(cutfree_output.value))
-    println("CutFree Degeneracy: ", get_degeneracy(String(replace(cutfree_output.value, "-" => ""))))
+    println("CutFree Degeneracy: ", get_degeneracy(String(cutfree_output.value)))
     println("CutFree Time: ", cutfree_output.time, " seconds")
 
     println("\nCutFreeRL Randomer: ")
     print_oligo_block(String(cutfreeRL_output.value))
-    println("CutFreeRL Degeneracy: ", degeneracy(String(cutfreeRL_output.value)))
+    println("CutFreeRL Degeneracy: ", get_degeneracy(String(cutfreeRL_output.value)))
     println("CutFreeRL Time: ", cutfreeRL_output.time, " seconds")
 end
 

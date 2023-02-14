@@ -234,7 +234,11 @@ get_degeneracy(oligo)
 function get_degeneracy(oligo)
     value = 0
     for code in str_to_vector(oligo)
-        value += log(length(IUB_CODES[code]))
+        if code == "-"
+            value += 0
+        else
+            value += log(length(IUB_CODES[code]))
+        end
     end
 
     return value

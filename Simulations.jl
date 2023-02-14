@@ -3,7 +3,7 @@ import Pkg
 Pkg.activate("cutfree-venv")
 Pkg.instantiate()
 
-using CSV, DataFrames, StatsBase
+using CSV, DataFrames, StatsBase, Suppressor
 
 include("CutFree.jl")
 include("CutFreeRL.jl")
@@ -62,10 +62,10 @@ function write_output(oligo, sites, clear_csv)
         TotalSites = length(sites),
         SiteLength = length(sites[1]),
         CutFree_Randomer = String(cutfree_output.value),
-        CutFree_Degeneracy = get_degeneracy(String(replace(cutfree_output.value, "-" => ""))),
+        CutFree_Degeneracy = get_degeneracy(String(cutfree_output.value)),
         CutFree_Time = cutfree_output.time,
         CutFreeRL_Randomer = String(cutfreeRL_output.value),
-        CutFreeRL_Degeneracy = degeneracy(String(cutfreeRL_output.value)),
+        CutFreeRL_Degeneracy = get_degeneracy(String(cutfreeRL_output.value)),
         CutFreeRL_Time = cutfreeRL_output.time,
     )
 
@@ -94,6 +94,17 @@ main()
     Run simulations.
 """
 function main()
+    # compile functions while supressing outputs
+    starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
+    restriction_sites = ["GGTCTC", "GGCCGG"]
+    min_blocks = 1
+    increase_diversity = true
+    @suppress_out begin
+        @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
+        @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    end
+
+    # run simulations
     clear_csv = true
     num_samples = 3
     oligos = get_oligos(6, 40)
