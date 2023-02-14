@@ -65,7 +65,7 @@ function write_output(oligo, sites, clear_csv)
         CutFree_Degeneracy = get_degeneracy(String(replace(cutfree_output.value, "-" => ""))),
         CutFree_Time = cutfree_output.time,
         CutFreeRL_Randomer = String(cutfreeRL_output.value),
-        CutFreeRL_Degeneracy = degeneracy(String(replace(cutfree_output.value, "-" => ""))),
+        CutFreeRL_Degeneracy = degeneracy(String(cutfreeRL_output.value)),
         CutFreeRL_Time = cutfreeRL_output.time,
     )
 
