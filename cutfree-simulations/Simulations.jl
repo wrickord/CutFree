@@ -54,7 +54,7 @@ function write_output(oligo, sites, clear_csv)
     cutfree_output = @timed cutfree(oligo, sites, 1, true)
     cutfreeRL_output = @timed cutfreeRL(oligo, sites, simulate=simulate_random, nsims=1000)
 
-    file = "cutfree-simulations.csv"
+    file = "runtime_data.csv"
     output = DataFrame(
         Oligo = oligo,
         OligoLength = length(oligo),
@@ -82,7 +82,7 @@ read_input(oligo, sites)
     Description:
     Read all simulation data from CSV.
 """
-function read_input(file="cutfree-simulations.csv")
+function read_input(file="runtime_data.csv")
     df = CSV.read(file, DataFrame)
     return df
 end
