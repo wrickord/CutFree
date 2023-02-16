@@ -5,8 +5,8 @@ Pkg.instantiate()
 
 using CSV, DataFrames, StatsBase, Suppressor
 
-include("CutFree.jl")
-include("CutFreeRL.jl")
+include("cutfree-algorithms/CutFree.jl")
+include("cutfree-algorithms/CutFreeRL.jl")
 
 """
 read_restriction_sites(file)
@@ -105,7 +105,7 @@ function main()
     end
 
     # run simulations
-    clear_csv = true
+    clear_csv = false
     num_samples = 3
     oligos = get_oligos(6, 40)
     for _ in 1:num_samples

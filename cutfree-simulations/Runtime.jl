@@ -1,4 +1,4 @@
-include("./CutFreeRL.jl")
+include("./cutfree-algoirthms/CutFreeRL.jl")
 using StatsBase
 
 rebase_data=CSV.read("./rebase_data.csv",DataFrame)

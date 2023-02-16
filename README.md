@@ -53,9 +53,9 @@ Open command prompt/terminal and navigate to the cloned repository.
 cd "ADD/PATH/HERE/CutFree"
 ```
 
-To run CutFree, use the Main-CMD.jl file as seen below.
+To run CutFree, use the Main.jl file as seen below.
 ```
-julia Main-CMD.jl --starting_oligo "NNNNNNNNNNNNNNNNNNNN" --restriction_sites "GGTCTC,GGCCGG" --min_blocks 1 --increase_diversity true
+julia Main.jl --starting_oligo "NNNNNNNNNNNNNNNNNNNN" --restriction_sites "GGTCTC,GGCCGG" --min_blocks 1 --increase_diversity true
 ```
 
 #### Explanation of Arguments
