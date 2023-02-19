@@ -5,6 +5,9 @@ Pkg.instantiate()
 
 using CSV, DataFrames, StatsBase, Suppressor
 
+include("../cutfree-algorithms/CutFree.jl")
+include("../cutfree-algorithms/CutFreeRL.jl")
+
 """
 read_restriction_sites(file)
 

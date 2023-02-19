@@ -1,4 +1,4 @@
-using Clp, Gurobi, GLPK, JuMP, DataStructures, NamedArrays
+using Clp, DataStructures, GLPK, Gurobi, JuMP, NamedArrays
 
 IUB_CODES = Dict(
     "A" => ["A"], 

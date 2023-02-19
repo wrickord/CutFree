@@ -3,10 +3,10 @@ import Pkg
 Pkg.activate("cutfree-venv")
 Pkg.instantiate()
 
-using Distributed, Suppressor
+using Suppressor
 
-@everywhere include("cutfree-algorithms/CutFree.jl")
-@everywhere include("cutfree-algorithms/CutFreeRL.jl")
+include("./cutfree-algorithms/CutFree.jl")
+include("./cutfree-algorithms/CutFreeRL.jl")
 
 """
 parse_commandline()

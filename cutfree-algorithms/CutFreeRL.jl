@@ -1,6 +1,6 @@
 import Base: *, sort
-using Random, Statistics, DataFrames, CSV
-using BioSequences, XLSX,ArgParse
+using Random, Statistics, DataFrames, CSV 
+using BioSequences, XLSX, ArgParse
 
 # Overload the concatenation operator to combine a sequence and 
 # a single base, i.e. dna"AGCGTGC" * DNA_T
