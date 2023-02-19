@@ -95,7 +95,7 @@ function main()
     starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
     restriction_sites = ["GGTCTC", "GGCCGG"]
     min_blocks = 1
-    increase_diversity = true
+    increase_diversity = false
     @suppress_out begin
         @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
         @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
