@@ -5,9 +5,6 @@ Pkg.instantiate()
 
 using CSV, DataFrames, StatsBase, Suppressor
 
-include("cutfree-algorithms/CutFree.jl")
-include("cutfree-algorithms/CutFreeRL.jl")
-
 """
 read_restriction_sites(file)
 
@@ -15,11 +12,11 @@ read_restriction_sites(file)
     Filter restriction enzymes data for the commericially available restriction enzymes.
     Adjust results based on length and palindromic arguments.
 """
-function read_restriction_sites(file="rebase_data.csv", enzyme_length=6, is_palindromic=true)
+function read_restriction_sites(file="cutfree-simulations\\rebase_data.csv", enzyme_length=6, is_palindromic=false)
     df = CSV.read(file, DataFrame)
     commercial_df = df[df[:,"commercial_source"].!="NA",:] # clean to only include commercially available restriction enzymes
-    temp_df = commercial_df[commercial_df[:,"length"].==enzyme_length,:] # clean based on length specification
-    re_df = temp_df[temp_df[:,"is_palindrome"].==is_palindromic,:] # clean based on palendromic specification
+    re_df = commercial_df[commercial_df[:,"length"].==enzyme_length,:] # clean based on length specification
+    # re_df = temp_df[temp_df[:,"is_palindrome"].==is_palindromic,:] # clean based on palindromic specification
 
     blocking_sites = []
     for seq in re_df[:,"base_sequence"]
@@ -51,10 +48,10 @@ write_output(oligo, sites)
     Record all simulation results and output to CSV file.
 """
 function write_output(oligo, sites, clear_csv)
-    cutfree_output = @timed cutfree(oligo, sites, 1, true)
+    cutfree_output = @timed cutfree(oligo, sites, 1, false)
     cutfreeRL_output = @timed cutfreeRL(oligo, sites, simulate=simulate_random, nsims=1000)
 
-    file = "runtime_data.csv"
+    file = "cutfree-simulations\\runtime_data.csv"
     output = DataFrame(
         Oligo = oligo,
         OligoLength = length(oligo),
@@ -82,7 +79,7 @@ read_input(oligo, sites)
     Description:
     Read all simulation data from CSV.
 """
-function read_input(file="runtime_data.csv")
+function read_input(file="cutfree-simulations\\runtime_data.csv")
     df = CSV.read(file, DataFrame)
     return df
 end
@@ -105,14 +102,14 @@ function main()
     end
 
     # run simulations
-    clear_csv = false
-    num_samples = 3
+    clear_csv = true
+    num_samples = 1
     oligos = get_oligos(6, 40)
     for _ in 1:num_samples
         for oligo in oligos
             for site_length in 4:8
                 for site_num in 1:10
-                    blocking_sites = unique(read_restriction_sites("rebase_data.csv", site_length, true))
+                    blocking_sites = unique(read_restriction_sites("cutfree-simulations\\rebase_data.csv", site_length, true))
                     write_output(oligo, sample(blocking_sites, site_num, replace=false), clear_csv)
                     clear_csv = false
                 end
