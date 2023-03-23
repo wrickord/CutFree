@@ -82,7 +82,7 @@ read_input(oligo, sites)
     Description:
     Read all simulation data from CSV.
 """
-function read_input(file="cutfree-simulations\\runtime_data.csv")
+function read_input(file="cutfree-simulations\\runtime_data_v0.csv")
     df = CSV.read(file, DataFrame)
     return df
 end
@@ -105,7 +105,7 @@ function main()
     end
 
     # run simulations
-    clear_csv = true
+    clear_csv = false
     num_samples = 1
     oligos = get_oligos(6, 40)
     for _ in 1:num_samples
