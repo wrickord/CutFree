@@ -98,5 +98,3 @@ plot4
 
 model4 <- lm(CutFree_Time ~ log(SiteLength)+log(OligoLength)*log(SiteLength)*log(TotalSites), data=runtime_data)
 summary(model4)
-
-
