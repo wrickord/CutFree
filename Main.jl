@@ -1,15 +1,15 @@
 import Pkg
 
-setup = true
+setup_environment = true
 
-if setup
+if setup_environment
     Pkg.activate("cutfree-venv")
     Pkg.instantiate()
 end
 
 using ArgParse, PyCall, Conda
 
-if setup
+if setup_environment
     Conda.add("scikit-learn")
 end
 
@@ -94,11 +94,6 @@ function main()
     println("Randomer: ", String(cutfree_output.value))
     println("Degeneracy: ", get_degeneracy(String(cutfree_output.value)))
     println("Time: ", cutfree_output.time, " seconds")
-
-    # println("\nCutFreeRL Randomer: ")
-    # print_oligo_block(String(cutfreeRL_output.value))
-    # println("CutFreeRL Degeneracy: ", get_degeneracy(String(cutfreeRL_output.value)))
-    # println("CutFreeRL Time: ", cutfreeRL_output.time, " seconds")
     
     return [algorithm_name, String(cutfree_output.value), get_degeneracy(String(cutfree_output.value)), cutfree_output.time]
 end
