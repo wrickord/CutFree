@@ -9,10 +9,6 @@ end
 
 using ArgParse, PyCall, Conda
 
-if setup_environment
-    Conda.add("scikit-learn")
-end
-
 include("./cutfree-algorithms/CutFree.jl")
 include("./cutfree-algorithms/CutFreeRL.jl")
 
