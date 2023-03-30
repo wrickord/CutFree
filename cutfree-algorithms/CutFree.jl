@@ -314,6 +314,7 @@ function cutfree(
     
     model = Model(Gurobi.Optimizer) # Gurobi can be changed to any open source solver you wish to use
     set_time_limit_sec(model, 60.0)
+    set_silent(model)
 
     C = zeros(15, m) # Degeneracy matrix
     for i in 1:15, j in 1:m

@@ -1,9 +1,17 @@
 import Pkg
 
-Pkg.activate("cutfree-venv")
-Pkg.instantiate()
+setup = true
 
-using Suppressor
+if setup
+    Pkg.activate("cutfree-venv")
+    Pkg.instantiate()
+end
+
+using ArgParse, PyCall, Conda
+
+if setup
+    Conda.add("scikit-learn")
+end
 
 include("./cutfree-algorithms/CutFree.jl")
 include("./cutfree-algorithms/CutFreeRL.jl")
@@ -34,6 +42,7 @@ function parse_commandline()
             arg_type = Bool
             default = true
     end
+
     return parse_args(s)
 end
 
@@ -51,32 +60,47 @@ function main()
     min_blocks = parsed_args["min_blocks"]
     increase_diversity = parsed_args["increase_diversity"]
 
-    # for manual entry of inputs
-    #=
-    starting_oligo = "NNNNNNNNNNNNNNNNNNNN"
-    restriction_sites = ["GGTCTC", "GGCCGG"]
-    min_blocks = 1
-    increase_diversity = true
-    =#
+    py"""
+    import pickle 
 
-    # compile functions while supressing outputs
-    @suppress_out begin
-        @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-        @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    def get_algorithm(starting_oligo, restriction_sites):
+        with open("./cutfree-models/cutfree_model.pkl", "rb") as f:
+            model = pickle.load(f)
+        return model.predict([[len(starting_oligo), len(restriction_sites), len(restriction_sites[0])]])
+    """
+
+    algorithm_choice = py"get_algorithm"(starting_oligo, restriction_sites)
+
+    if algorithm_choice[1] == 0 || min_blocks > 1
+        println("Optimizing...")
+        algorithm_name = "CutFree"
+        cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
+    elseif algorithm_choice[1] == 1
+        println("Optimizing...")
+        algorithm_name = "CutFreeRL"
+        cutfree_output = cutfree_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
     end
 
-    cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    cutfreeRL_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    # compile functions while supressing outputs
+    # @suppress_out begin
+    #     @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
+    #     @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    # end
 
-    println("\nCutFree Randomer: ")
-    print_oligo_block(String(cutfree_output.value))
-    println("CutFree Degeneracy: ", get_degeneracy(String(cutfree_output.value)))
-    println("CutFree Time: ", cutfree_output.time, " seconds")
+    # cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
+    # cutfreeRL_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
 
-    println("\nCutFreeRL Randomer: ")
-    print_oligo_block(String(cutfreeRL_output.value))
-    println("CutFreeRL Degeneracy: ", get_degeneracy(String(cutfreeRL_output.value)))
-    println("CutFreeRL Time: ", cutfreeRL_output.time, " seconds")
+    println("\nAlgorithm: ", algorithm_name)
+    println("Randomer: ", String(cutfree_output.value))
+    println("Degeneracy: ", get_degeneracy(String(cutfree_output.value)))
+    println("Time: ", cutfree_output.time, " seconds")
+
+    # println("\nCutFreeRL Randomer: ")
+    # print_oligo_block(String(cutfreeRL_output.value))
+    # println("CutFreeRL Degeneracy: ", get_degeneracy(String(cutfreeRL_output.value)))
+    # println("CutFreeRL Time: ", cutfreeRL_output.time, " seconds")
+    
+    return [algorithm_name, String(cutfree_output.value), get_degeneracy(String(cutfree_output.value)), cutfree_output.time]
 end
 
 main()
