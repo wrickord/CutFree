@@ -1,6 +1,6 @@
 import Pkg
 
-setup_environment = false
+setup_environment = true
 
 if setup_environment
     Pkg.activate("cutfree-venv")
@@ -44,6 +44,7 @@ function parse_commandline()
         "--algorithm"
             help = "force solve with a specific algorithm (CutFree or CutFreeRL)"
             arg_type = String
+            default = ""
     end
 
     return parse_args(s)
@@ -62,13 +63,13 @@ function main()
     restriction_sites = split(parsed_args["restriction_sites"], ",")
     min_blocks = parsed_args["min_blocks"]
     increase_diversity = parsed_args["increase_diversity"]
-    forced_algorithm = parsed_args["algorithm"]
+    forced_algorithm = lowercase(parsed_args["algorithm"])
 
-    if forced_algorithm == "CutFree"
+    if forced_algorithm == "cutfree"
         println("Optimizing...")
         algorithm_name = "CutFree"
         cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    elseif forced_algorithm == "CutFreeRL"
+    elseif forced_algorithm == "cutfreerl"
         println("Optimizing...")
         algorithm_name = "CutFreeRL"
         cutfree_output = cutfree_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
