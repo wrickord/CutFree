@@ -1,13 +1,13 @@
 import Pkg
 
-setup_environment = true
+setup_environment = false
 
 if setup_environment
     Pkg.activate("cutfree-venv")
     Pkg.instantiate()
 end
 
-using ArgParse, PyCall, Conda
+using ArgParse, PyCall, Conda, Suppressor
 
 if setup_environment
     Conda.add("scikit-learn")
@@ -15,7 +15,6 @@ end
 
 include("./cutfree-algorithms/CutFree.jl")
 include("./cutfree-algorithms/CutFreeRL.jl")
-
 
 """
 parse_commandline()
@@ -41,7 +40,10 @@ function parse_commandline()
         "--increase_diversity"
             help = "increase the diversity of the randomer while maintaining its degeneracy"
             arg_type = Bool
-            default = true
+            default = false
+        "--algorithm"
+            help = "force solve with a specific algorithm (CutFree or CutFreeRL)"
+            arg_type = String
     end
 
     return parse_args(s)
@@ -60,26 +62,57 @@ function main()
     restriction_sites = split(parsed_args["restriction_sites"], ",")
     min_blocks = parsed_args["min_blocks"]
     increase_diversity = parsed_args["increase_diversity"]
+    forced_algorithm = parsed_args["algorithm"]
 
-    py"""
-    import pickle 
-
-    def get_algorithm(starting_oligo, restriction_sites):
-        with open("./cutfree-models/cutfree_model.pkl", "rb") as f:
-            model = pickle.load(f)
-        return model.predict([[len(starting_oligo), len(restriction_sites), len(restriction_sites[0])]])
-    """
-
-    algorithm_choice = py"get_algorithm"(starting_oligo, restriction_sites)
-
-    if algorithm_choice[1] == 0 || min_blocks > 1
+    if forced_algorithm == "CutFree"
         println("Optimizing...")
         algorithm_name = "CutFree"
         cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
-    elseif algorithm_choice[1] == 1
+    elseif forced_algorithm == "CutFreeRL"
         println("Optimizing...")
         algorithm_name = "CutFreeRL"
         cutfree_output = cutfree_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+    else
+        py"""
+        import pickle 
+
+        def get_algorithm_classification(starting_oligo, restriction_sites):
+            with open("./cutfree-models/cutfree_algorithm_classification_model.pkl", "rb") as f:
+                model = pickle.load(f)
+            return model.predict([[len(starting_oligo), len(restriction_sites), len(restriction_sites[0])]])
+        """
+
+        choose_RL = 0
+        algorithm_choice = py"get_algorithm_classification"(starting_oligo, restriction_sites)
+
+        if algorithm_choice[1] == 0 || min_blocks > 1 || increase_diversity == true
+            py"""
+            import pickle 
+
+            def accept_classification(starting_oligo, restriction_sites):
+                with open("./cutfree-models/cutfree_runtime_classification_model.pkl", "rb") as f:
+                    model = pickle.load(f)
+                return model.predict([[len(starting_oligo), len(restriction_sites), len(restriction_sites[0])]])
+            """
+            println("Checking if CutFree is a good choice...")
+            accept_choice = py"accept_classification"(starting_oligo, restriction_sites)
+
+            if accept_choice[1] == 1
+                println("Accepted!")
+                println("Optimizing...")
+                algorithm_name = "CutFree"
+                cutfree_output = @timed cutfree(starting_oligo, restriction_sites, min_blocks, increase_diversity)
+            else
+                println("Rejected! Using CutFreeRL instead...")
+                choose_RL = 1
+            end
+        end
+
+        if algorithm_choice[1] == 1 || choose_RL == 1
+            println("Optimizing...")
+            algorithm_name = "CutFreeRL"
+            cutfree_output = cutfree_output = @timed cutfreeRL(starting_oligo, restriction_sites, simulate=simulate_random, nsims=1000)
+        end
     end
 
     # compile functions while supressing outputs
