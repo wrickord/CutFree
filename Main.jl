@@ -7,7 +7,7 @@ if setup_environment
     Pkg.instantiate()
 end
 
-using ArgParse, PyCall, Conda, Suppressor
+using ArgParse, PyCall, Conda
 
 if setup_environment
     Conda.add("scikit-learn")
