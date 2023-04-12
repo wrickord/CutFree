@@ -82,7 +82,7 @@ read_input(oligo, sites)
     Description:
     Read all simulation data from CSV.
 """
-function read_input(file="cutfree-simulations\\runtime_data_v0.csv")
+function read_input(file="cutfree-simulations\\runtime_data_v3.csv")
     df = CSV.read(file, DataFrame)
     return df
 end
