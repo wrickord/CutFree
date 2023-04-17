@@ -1,6 +1,6 @@
 # CutFree
 
-CutFree is a tool created to design pools of DNA barcodes compatible with restriction enzymes. The solution can be derived algorithmically (CutFree) or heuristically (CutFreeRL), and a model (CutFree-Algorithm-Classification) has been developed to automatically assess which method is best for each given input.
+CutFree is a tool created to design pools of DNA barcodes compatible with restriction enzymes. The solution can be derived algorithmically (CutFree) or heuristically (CutFreeRL), and an ensemble model has been developed to automatically assess which method is best for each given input.
 
 ## CutFree GUI: <br>https://jensenlab.shinyapps.io/cutfree/
 
