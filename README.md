@@ -71,3 +71,6 @@ julia Main.jl --starting_oligo "NNNNNNNNNNNNNNNNNNNN" --restriction_sites "GGTCT
 
 --algorithm (String): Input either "CutFree" or "CutFreeRL" to force the input to run with the specified algorithm.
 #### NOTE: Not required. Available if user would like to override the models selection of which method to use to find the solution. If left blank, the model will make this choice for you.
+
+# NCSA 2023 Poster
+![alt text](https://github.com/wrickord/CutFree/blob/main/poster.png)
