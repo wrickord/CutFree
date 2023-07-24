@@ -1,6 +1,5 @@
 # CutFree
-
-CutFree is a tool created to design pools of DNA barcodes compatible with restriction enzymes. The solution can be derived algorithmically (CutFree) or heuristically (CutFreeRL), and an ensemble model has been developed to automatically assess which method is best for each given input.
+CutFree constructs randomers free of user-specified restriction enzyme recognition sites to prevent improper DNA assembly in workflows utilizing restriction enzymes. The solution can be derived deterministically via mixed-integer linear programming (CutFree) or heuristically via reinforcement learning and stoichastic search (CutFreeRL). An algorithm classification model was developed by fine-tuning a pre-trained DistilBERT and multi-layer perceptron.
 
 ## CutFree GUI: <br>https://jensenlab.shinyapps.io/cutfree/
 
@@ -37,7 +36,7 @@ git clone "https://github.com/wrickord/CutFree.git"
 ```
 
 ## Changing the Model
-In addition to using the Gurobi MILP optimization tool, CutFree's implementation makes it convenient to utilize open-source optimizers, such as GLPK (download included in cutfree-venv).
+In addition to using the Gurobi MILP optimization tool, CutFree's implementation makes it convenient to utilize open-source optimizers, such as GLPK (download included in venv).
 
 Simply install your open-source optimizer of choice, add "Using OPTIMIZER_NAME" (where OPTIMIZER_NAME=GLPK, for example) to the top of CutFree.jl, nagivate to **line 315 of CutFree.jl**, and change "Gurobi" to the name of your optimizer.
 
@@ -60,17 +59,19 @@ julia Main.jl --starting_oligo "NNNNNNNNNNNNNNNNNNNN" --restriction_sites "GGTCT
 ```
 
 ### Explanation of Arguments
---starting_oligo (String): Input an oligo of any size to create a randomer of that size.
+Starting Oligo:
+- Starting DNA sequence that should be blocked from containing restriction sites. To generate a set of barcodes with the highest diversity, start with a string of N's the length of your oligo.
 
---restriction_sites (String): Input a vector of the sequences of the restriction enzymes you wish to block.
-#### NOTE: The list of restiction sites must be entered as a single string with sites separated by commas (i.e., "GGTCTC,GGCCGG"). Avoid entering spaces.
+Restriction Enzyme Recognition Sites to Block:
+- Sequences to block from the oligo pools. Separate multiple sequences by commas. Common names are accepted for many popular enzymes. For example, "BsaI" and "GGTCTC" are both valid inputs.
 
---min_block (Int): Input the minimum number of blocks you desire.
+Minimum # of Blocks:
+- Minimum number of blocks at each site, i.e. the minimum number of changes that need to be made for a cut site to appear anywhere in the oligo. Values greater than 1 are only valid for CutFree algorithm, not CutFreeRL.
 
---increase_diversity (Bool): Input a boolean to tell the program whether or not it should find the most random output while maintaining its degeneracy.
+Increase Diversity:
+- Toggle to re-run the optimization to randomize the codes while maintaining the same number of oligos (i.e., same degeneracy). Only valid for CutFree algorithm, not CutFreeRL.
 
---algorithm (String): Input either "CutFree" or "CutFreeRL" to force the input to run with the specified algorithm.
-#### NOTE: Not required. Available if user would like to override the models selection of which method to use to find the solution. If left blank, the model will make this choice for you.
-
-# NCSA 2023 Poster
-![alt text](https://github.com/wrickord/CutFree/blob/main/NCSA2023-CutFree.png)
+Algorithm Choice:
+- Auto: Automatically chooses the best algorithm for the given input.
+- CutFree: Uses the CutFree algorithm.
+- CutFreeRL: Uses the CutFreeRL algorithm.
