@@ -1,4 +1,5 @@
 # import packages
+import Base: names
 using Clp, DataStructures, GLPK, Gurobi, JuMP, NamedArrays
 
 # define IUB code dictionary

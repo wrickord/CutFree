@@ -1,23 +1,40 @@
+# import packages
 import Base: *, sort
+import DataAPI: nrow
 using Random, Statistics, DataFrames, CSV 
 using BioSequences, XLSX, ArgParse
 
-# Overload the concatenation operator to combine a sequence and 
-# a single base, i.e. dna"AGCGTGC" * DNA_T
+
+# helper functions
+"""
+*(seq, base)
+
+    Description:
+    Overload the concatenation operator to combine a sequence and a single 
+    base, i.e. dna"AGCGTGC" * DNA_T.
+"""
 function *(seq::LongSequence{DNAAlphabet{4}}, base::DNA)
     seq * LongDNA{4}([base])
 end
 
-# Overload sort to order DNA codes by degeneracy:
-#   A,G,C,T,M,R,W,S,Y,K,V,H,D,B,N
-function sort(seq::LongSequence{DNAAlphabet{4}}; rev::Bool=false)
-    sort(collect(seq), by=degeneracy, rev=rev)
-end
 
 """
-    isvalid(seq, sites)
+sort_dna(seq; rev)
 
-Check if any of the sites appear in the sequence.
+    Description:
+    Create sort function to order DNA codes by their degeneracy 
+    (i.e., A,G,C,T,M,R,W,S,Y,K,V,H,D,B,N).
+"""
+function sort_dna(seq::LongSequence{DNAAlphabet{4}}; rev::Bool=false)
+    sort(collect(seq), by=get_degeneracy_rl, rev=rev)
+end
+
+
+"""
+isvalid(seq, sites)
+
+    Description:
+    Check if any of the sites appear in the sequence.
 """
 function isvalid(seq, sites)
     for site in sites
@@ -25,14 +42,17 @@ function isvalid(seq, sites)
             return false
         end
     end
+
     return true
 end
 
-"""
-    find_valid_randomer(prefix, bases, sites)
 
-Randomly select bases to add the prefix, ensuring no site
-appears in the randomer.
+"""
+find_valid_randomer(prefix, bases, sites)
+
+    Description:
+    Randomly select bases to add the prefix, ensuring no site appears in 
+    the randomer.
 """
 function find_valid_randomer(prefix, bases, sites)
     n = length(bases)
@@ -55,19 +75,21 @@ function find_valid_randomer(prefix, bases, sites)
     return randomer
 end
 
-"""
-    degeneracy(base::DNA[, uselog2=true])
 
-Calculate the degeneracy of a single base. The degeneracy 
-is the number of bases in the code, so
-    degeneracy(DNA_N) == 4
-and
-    degeneracy(DNA_A) == 1
-
-If `uselog2`, the degeneracy is log2 transformed. Because degeneracy(DNA_Gap)=0, we approximate
-the log2 transformation as 2^-100. 
 """
-function degeneracy(base::DNA; uselog2=true)
+get_degeneracy_rl(base; uselog2)
+
+    Description:
+    Calculate the degeneracy of a single base. The degeneracy is the  
+    number of bases in the code, so:
+        degeneracy(DNA_N) == 4
+    and
+        degeneracy(DNA_A) == 1
+
+    We score using the log of the degeneracy. Because degeneracy(DNA_Gap) = 0, 
+    we approximate the log2 transformation as 2^-100. 
+"""
+function get_degeneracy_rl(base::DNA; uselog2=true)
     deg = 0.0
     if base == DNA_N
         deg = 4.0
@@ -93,15 +115,16 @@ function degeneracy(base::DNA; uselog2=true)
 end
 
 """
-    degeneracy(seq::LongSequence{DNAAlphabet{4}}; uselog2=true)
+get_degeneracy_rl(seq; uselog2)
 
-Calculate the degeneracy of a DNA sequence.
+    Description:
+    Calculate the degeneracy of a DNA sequence.
 """
-function degeneracy(seq::LongSequence{DNAAlphabet{4}}; uselog2=true)
+function get_degeneracy_rl(seq::LongSequence{DNAAlphabet{4}}; uselog2=true)
     if uselog2
-        return sum(degeneracy.(seq, uselog2=true))
+        return sum(get_degeneracy_rl.(seq, uselog2=true))
     else
-        return prod(degeneracy.(seq ;uselog2=false))
+        return prod(get_degeneracy_rl.(seq; uselog2=false))
     end
 end
 
@@ -110,7 +133,7 @@ function simulate_random(prefix, bases, sites; nsims=1000, horizon=length(bases)
     degs = zeros(nsims)
     true_horizon = min(horizon, length(bases)) # don't go beyond the randomer length
     for i = 1:nsims
-        degs[i] = degeneracy(find_valid_randomer(prefix, bases[1:true_horizon], sites))
+        degs[i] = get_degeneracy_rl(find_valid_randomer(prefix, bases[1:true_horizon], sites))
     end
     return mean(degs)
 end
@@ -122,7 +145,7 @@ function simulate_greedy(prefix, bases, sites; horizon=length(bases))
         # Iterate through the bases by decending degeneracy, so the greedy approach
         # is to stop as soon as we've found one.
         found = false # define out here for scoping rules
-        for base in sort(bases[h], rev=true)
+        for base in sort_dna(bases[h], rev=true)
             found = false
             if isvalid(prefix * base, sites)
                 prefix *= base
@@ -135,7 +158,7 @@ function simulate_greedy(prefix, bases, sites; horizon=length(bases))
             break
         end
     end
-    return degeneracy(prefix)
+    return get_degeneracy_rl(prefix)
 end
 
 """
@@ -187,7 +210,7 @@ function CutFreeRL(sequence::LongSequence{DNAAlphabet{4}}, sites::Array{LongSequ
             #   1. the mean randomer degeneracy is higher than the previous best, OR
             #   2. the randomer degeneracy is tied with the previous best, but the new base has
             #      higher individual degeneracy
-            if deg > best_deg || (deg == best_deg && degeneracy(base) > degeneracy(best_base))
+            if deg > best_deg || (deg == best_deg && get_degeneracy_rl(base) > get_degeneracy_rl(best_base))
                 best_deg = deg
                 best_base = base
             end
@@ -258,7 +281,7 @@ function cutfreeRL(sequence::String, sites::Any; simulate=simulate_random, kwarg
             #   1. the mean randomer degeneracy is higher than the previous best, OR
             #   2. the randomer degeneracy is tied with the previous best, but the new base has
             #      higher individual degeneracy
-            if deg > best_deg || (deg == best_deg && degeneracy(base) > degeneracy(best_base))
+            if deg > best_deg || (deg == best_deg && get_degeneracy_rl(base) > get_degeneracy_rl(best_base))
                 best_deg = deg
                 best_base = base
             end
@@ -276,19 +299,14 @@ function cutfreeRL(sequence::String, sites::Any; simulate=simulate_random, kwarg
     return randomer
 end
 
-#= Test code
+# Test code
 sequence=dna"NNNNNNNNNNNNNNNNNNNN"
 sites = [dna"GGTCTC"] # BsaI
 randomer = CutFreeRL(sequence, sites, simulate=simulate_random, nsims=1000)
-=#
-
-#
-#randomer = CutFreeRL(sequence, sites, simulate=simulate_greedy)
-
-#deg = degeneracy(randomer)
-#natdeg = deg / log2(exp(1))
-#println("Final randomer: $randomer")
-#println("Final degeneracy: $deg ($natdeg)")
+deg = get_degeneracy_rl(randomer)
+natdeg = deg / log2(exp(1))
+println("Final randomer: $randomer")
+println("Final degeneracy: $deg ($natdeg)")
 
 # Run the benchmark CutFree set
 function runtimes(data)
@@ -307,12 +325,12 @@ function runtimes(data)
     for i = 1:nrow(data)
         bases = [all_bases for _ in 1:data.oligo_lengths[i]] #used for running lengths data 
         stats = @timed CutFreeRL(bases, sites[i], nsims=1000)
-        data[i,:random_objval] = degeneracy(stats.value; uselog2=false)
+        data[i,:random_objval] = get_degeneracy_rl(stats.value; uselog2=false)
         data[i,:random_runtime] = stats.time
         data[i,:random_code] = convert(String, stats.value)
 
         stats = @timed CutFreeRL(bases, sites[i], simulate=simulate_greedy)
-        data[i,:greedy_objval] = degeneracy(stats.value;uselog2=false)
+        data[i,:greedy_objval] = get_degeneracy_rl(stats.value;uselog2=false)
         data[i,:greedy_runtime] = stats.time
         data[i,:greedy_code] = convert(String, stats.value)
         println(i)
@@ -320,11 +338,6 @@ function runtimes(data)
     return data
 end
 
-#data = runtimes(CSV.read("./results.csv")[1:10,:])
-#data = runtimes(CSV.read("./results_sites_4_1_21.csv"))
-#CSV.write("rollout_results_sites_4_1_21.csv",data)
-#data = runtimes(CSV.read("./results_length_4_15_21_combined.csv"))
-#CSV.write("rollout_results_length_4_15_21.csv",data)
 function read_restriction_sites(file="cutfree_rebase_data.xlsx") #File taken from the rebase.R code. Filtered for the 56 commerially available, palindromic, 6 bp, restriction sites 
     xf=XLSX.readxlsx(file);
     x=xf[XLSX.sheetnames(xf)[1]]
@@ -347,46 +360,5 @@ function random_subset(data;size=10)
         return shuffled[1:size]
     end 
 end
-
-# function parse_commandline()
-#     s = ArgParseSettings()
-
-#     @add_arg_table s begin
-#         "--sequence","-s"
-#             help="Starting DNA sequence that should be blocked from containing restriction sites. To generate a set of barcodes with the highest diversity, start with a string of N's the length of your oligo. "
-#             required=true   
-#         "--restrictionsites","-r"
-#             help = "Sequences to block from the oligo pools. Separate multiple sequences by commas. Do not include spaces."
-#             required=true
-#         "--nsims","-n"
-#             help = "Number of simulations per rollout"
-#             arg_type= Int
-#             default=100
-#     end
-
-#     return parse_args(s)
-# end
-
-# function main()
-#     parsed_args = parse_commandline()
-#     println("Parsed args:")
-#     for (arg,val) in parsed_args
-#         println("  $arg  =>  $val")
-#     end
-
-
-#     sequence=parsed_args["sequence"]
-#     sites=parsed_args["restrictionsites"]
-#     nsims=parsed_args["nsims"]
-#     sequence=LongDNA{4}.(sequence)
-#     sites=LongDNA{4}.(split(sites,","))
-#     randomer=CutFreeRL(sequence,sites;nsims=nsims)
-#     randomer=String(randomer)
-#     show(stdout,"text/plain",randomer)
-#     println("\n")
-# end
-
-
-# main()
 
 
