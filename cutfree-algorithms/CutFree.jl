@@ -200,17 +200,17 @@ end
 
 
 """
-reverse_complement(oligo)
+complement_reverse(oligo)
 
     Description:
     Return the reverse of an array of the complements for any given IUB codes.
 
     Example:
-    julia> println(reverse_complement("HDN"))
+    julia> println(complement_reverse("HDN"))
 
     ["N", "H", "D"]
 """
-function reverse_complement(oligo)
+function complement_reverse(oligo)
     return reverse(complement(oligo))
 end
 
@@ -227,7 +227,7 @@ expand_asymmetric(oligo)
     ["HDN", "NHD"]
 """
 function expand_asymmetric(oligo)
-    return [oligo, vector_to_str(reverse_complement(oligo))]
+    return [oligo, vector_to_str(complement_reverse(oligo))]
 end
 
 

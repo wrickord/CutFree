@@ -13,3 +13,6 @@ algorithm-classifier/models/AlgorithmClassifier-V3/logs
 
 algorithm-classifier/models/AlgorithmClassifier-V4/checkpoints
 algorithm-classifier/models/AlgorithmClassifier-V4/logs
+
+algorithm-classifier/models/AlgorithmClassifier-V5/checkpoints
+algorithm-classifier/models/AlgorithmClassifier-V5/logs
