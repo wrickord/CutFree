@@ -1,4 +1,0 @@
-This experiment was recorded with all model architectures using L1L2
-regularization with a value of 1e-3.
-
-Additionally, the dropout value for the first layer after BERT was 0.8.
