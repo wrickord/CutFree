@@ -1,0 +1,9 @@
+"              precision    recall  f1-score   support
+
+     CutFree       0.92      0.93      0.93      4111
+   CutFreeRL       0.78      0.77      0.77      1356
+
+    accuracy                           0.89      5467
+   macro avg       0.85      0.85      0.85      5467
+weighted avg       0.89      0.89      0.89      5467
+"
